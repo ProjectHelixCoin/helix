@@ -17,7 +17,7 @@
 #include "masternodeconfig.h"
 #include "masternodeman.h"
 #include "sync.h"
-#include "wallet.h"
+#include "wallet/wallet.h"
 #include "walletmodel.h"
 #include "util.h"
 
@@ -60,21 +60,21 @@ MasternodeList::MasternodeList(QWidget* parent) : QWidget(parent),
     QAction* startAliasAction = new QAction(tr("Start alias"), this);
     QAction* copyAliasAction = new QAction(tr("Copy alias"), this);
     QAction* editAliasAction = new QAction(tr("Edit alias"), this);
-    QAction* deleteAliasAction = new QAction(tr("Delete"), this);	
+    QAction* deleteAliasAction = new QAction(tr("Delete"), this);
 
     contextMenu = new QMenu();
     contextMenu->addAction(startAliasAction);
     contextMenu->addAction(copyAliasAction);
     contextMenu->addAction(editAliasAction);
-    contextMenu->addAction(deleteAliasAction);	
-	
+    contextMenu->addAction(deleteAliasAction);
+
     connect(ui->tableWidgetMyMasternodes, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showContextMenu(const QPoint&)));
-    connect(startAliasAction, SIGNAL(triggered()), this, SLOT(on_startButton_clicked()));	
-    connect(copyAliasAction, SIGNAL(triggered()), this, SLOT(copyAlias()));	
-    connect(editAliasAction, SIGNAL(triggered()), this, SLOT(on_editConfigureMasternode_clicked()));	
-    connect(deleteAliasAction, SIGNAL(triggered()), this, SLOT(deleteAlias()));	
-	
-	
+    connect(startAliasAction, SIGNAL(triggered()), this, SLOT(on_startButton_clicked()));
+    connect(copyAliasAction, SIGNAL(triggered()), this, SLOT(copyAlias()));
+    connect(editAliasAction, SIGNAL(triggered()), this, SLOT(on_editConfigureMasternode_clicked()));
+    connect(deleteAliasAction, SIGNAL(triggered()), this, SLOT(deleteAlias()));
+
+
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(updateMyNodeList()));
     timer->start(1000);
@@ -110,7 +110,7 @@ void MasternodeList::StartAlias(std::string strAlias)
     std::string strStatusHtml;
     strStatusHtml += "<center>Alias: " + strAlias;
 
-    BOOST_FOREACH (CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
+    for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
         if (mne.getAlias() == strAlias) {
             std::string strError;
             CMasternodeBroadcast mnb;
@@ -142,7 +142,7 @@ void MasternodeList::StartAll(std::string strCommand)
     int nCountFailed = 0;
     std::string strFailedHtml;
 
-    BOOST_FOREACH (CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
+    for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
         std::string strError;
         CMasternodeBroadcast mnb;
 
@@ -187,7 +187,7 @@ void MasternodeList::updateMyMasternodeInfo(QString strAlias, QString strAddr, C
 
     bool fOldRowFound = false;
     int nNewRow = 0;
-	
+
     for (int i = 0; i < ui->tableWidgetMyMasternodes->rowCount(); i++) {
         if (ui->tableWidgetMyMasternodes->item(i, 0)->text() == strAlias) {
             fOldRowFound = true;
@@ -231,7 +231,7 @@ void MasternodeList::updateMyNodeList(bool fForce)
     nTimeMyListUpdated = GetTime();
 
     ui->tableWidgetMyMasternodes->setSortingEnabled(false);
-    BOOST_FOREACH (CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
+    for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
         int nIndex;
         if(!mne.castOutputIndex(nIndex))
             continue;
@@ -293,34 +293,34 @@ void MasternodeList::on_editConfigureMasternode_clicked()
     std::string strAlias = ui->tableWidgetMyMasternodes->item(nSelectedRow, 0)->text().toStdString();
 
 	int count = 0;
-    BOOST_FOREACH (CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
+    for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
 		count = count + 1;
 		if(strAlias == mne.getAlias()) {
 			MasternodeList::openEditConfigureMasternodePage(QString::fromStdString(mne.getAlias()), QString::fromStdString(mne.getIp()), QString::fromStdString(mne.getPrivKey()), QString::fromStdString(mne.getTxHash()), QString::fromStdString(mne.getOutputIndex()), count);
 			break;
-			
+
 		}
     }
 }
 
 void MasternodeList::on_configureMasternodeButton_clicked()
 {
-	
+
     ConfigureMasternodePage dlg(ConfigureMasternodePage::NewConfigureMasternode, this);
     if ( QDialog::Accepted == dlg.exec() )
     {
 while (ui->tableWidgetMyMasternodes->rowCount() > 0)
 	{
 		ui->tableWidgetMyMasternodes->removeRow(0);
-	}		
-	
+	}
+
 	// clear cache
 	masternodeConfig.clear();
     // parse masternode.conf
     std::string strErr;
     if (!masternodeConfig.read(strErr)) {
         LogPrintf("Error reading masternode configuration file: \n");
-    }	
+    }
       updateMyNodeList(true);
     }
 }
@@ -340,15 +340,15 @@ void MasternodeList::openEditConfigureMasternodePage(QString strAlias, QString s
 while (ui->tableWidgetMyMasternodes->rowCount() > 0)
 	{
 		ui->tableWidgetMyMasternodes->removeRow(0);
-	}		
-	
+	}
+
 	// clear cache
 	masternodeConfig.clear();
     // parse masternode.conf
     std::string strErr;
     if (!masternodeConfig.read(strErr)) {
         LogPrintf("Error reading masternode configuration file: \n");
-    }	
+    }
       updateMyNodeList(true);
     }
 }
@@ -365,7 +365,7 @@ void MasternodeList::deleteAlias()
     int nSelectedRow = index.row();
     std::string strAlias = ui->tableWidgetMyMasternodes->item(nSelectedRow, 0)->text().toStdString();
 	int count = 0;
-    BOOST_FOREACH (CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
+    for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
 		count = count + 1;
 		if(strAlias == mne.getAlias()) {
 			vector<COutPoint> confLockedCoins;
@@ -383,18 +383,18 @@ void MasternodeList::deleteAlias()
 while (ui->tableWidgetMyMasternodes->rowCount() > 0)
 	{
 		ui->tableWidgetMyMasternodes->removeRow(0);
-	}		
-	
+	}
+
 	// clear cache
 	masternodeConfig.clear();
     // parse masternode.conf
     std::string strErr;
     if (!masternodeConfig.read(strErr)) {
         LogPrintf("Error reading masternode configuration file: \n");
-    }			
+    }
 			updateMyNodeList(true);
 			break;
-			
+
 		}
     }
 }
@@ -411,14 +411,14 @@ void MasternodeList::copyAlias()
     int nSelectedRow = index.row();
     std::string strAlias = ui->tableWidgetMyMasternodes->item(nSelectedRow, 0)->text().toStdString();
 
-    BOOST_FOREACH (CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
-		
+    for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
+
 		if(strAlias == mne.getAlias()) {
-			
+
 			std::string fullAliasCopy = mne.getAlias() + " " + mne.getIp() + " " + mne.getPrivKey() + " " + mne.getTxHash() + " " + mne.getOutputIndex();
 			GUIUtil::setClipboard(QString::fromStdString(fullAliasCopy));
 			break;
-			
+
 		}
     }
 }

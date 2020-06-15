@@ -11,6 +11,8 @@
 #include "spork.h"
 #include "accumulatorcheckpoints.h"
 
+#include <iterator>
+
 using namespace libzerocoin;
 
 std::map<uint32_t, CBigNum> mapAccumulatorValues;
@@ -261,7 +263,7 @@ bool CalculateAccumulatorCheckpoint(int nHeight, uint256& nCheckpoint, Accumulat
         LogPrint("zero", "%s found %d mints\n", __func__, listPubcoins.size());
 
         //add the pubcoins to accumulator
-        for (const PublicCoin pubcoin : listPubcoins) {
+        for (const PublicCoin& pubcoin : listPubcoins) {
             if(!mapAccumulators.Accumulate(pubcoin, true))
                 return error("%s: failed to add pubcoin to accumulator at height %d", __func__, pindex->nHeight);
         }
@@ -512,7 +514,7 @@ map<CoinDenomination, int> GetMintMaturityHeight()
 
         if (isFinished)
             break;
-        pindex = chainActive[pindex->nHeight - 1];
+        pindex = pindex->pprev;
     }
 
     //Generate final map

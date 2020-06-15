@@ -11,7 +11,7 @@
 #include "platformstyle.h"
 #include "sync.h"
 #include "util.h"
-#include "wallet.h"
+#include "wallet/wallet.h"
 
 #include <QMenu>
 #include <QTimer>

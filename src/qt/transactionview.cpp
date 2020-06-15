@@ -135,7 +135,7 @@ TransactionView::TransactionView(QWidget* parent) : QWidget(parent), model(0), t
     vlayout->setSpacing(0);
 
     QTableView* view = new QTableView(this);
-    view->setShowGrid(true);
+    view->setShowGrid(false);
     vlayout->addLayout(hlayout);
     QSpacerItem* verticalSpacer_3 = new QSpacerItem(20, 20, QSizePolicy::Minimum, QSizePolicy::Preferred);
     vlayout->addItem(verticalSpacer_3);

@@ -1,7 +1,9 @@
 // Copyright (c) 2011-2013 The Bitcoin Core developers
 // Copyright (c) 2018 The Phore developers
 // Copyright (c) 2018-2019 The Helix developers
-// Distributed under the MIT software license, see the accompanying
+// Copyright (c) 2018 The Curium developers
+// Copyright (c) 2017-2018 The Bulwark Developers
+// Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef BITCOIN_QT_PROPOSALFILTERPROXY_H
@@ -26,6 +28,8 @@ public:
 
     void setProposalStart(const CAmount& minimum);
     void setProposalEnd(const CAmount& minimum);
+    void setTotalPaymentCount(const int& count);
+    void setRemainingPaymentCount(const int& count);
     void setProposal(const QString &proposal);
     
     void setMinAmount(const CAmount& minimum);
@@ -42,6 +46,8 @@ protected:
 private:
     CAmount startDate;
     CAmount endDate;
+    int totalPaymentCount;
+    int remainingPaymentCount;
     QString proposalName;
     CAmount minAmount;
     CAmount votesNeeded;
