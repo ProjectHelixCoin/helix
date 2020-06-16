@@ -2,7 +2,7 @@
 name: "helix-aarch64-1.6"
 enable_cache: true
 suites:
-- "xenial"
+- "bionic"
 architectures:
 - "amd64"
 packages:
