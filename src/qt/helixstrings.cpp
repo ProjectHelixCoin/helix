@@ -8,7 +8,7 @@
 #else
 #define UNUSED
 #endif
-static const char UNUSED *Helix_strings[] = {
+static const char UNUSED *helix_strings[] = {
 QT_TRANSLATE_NOOP("Helix-core", " mints deleted\n"),
 QT_TRANSLATE_NOOP("Helix-core", " mints updated, "),
 QT_TRANSLATE_NOOP("Helix-core", " unconfirmed transactions removed\n"),

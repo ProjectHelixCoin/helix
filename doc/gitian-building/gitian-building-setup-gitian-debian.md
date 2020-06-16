@@ -28,10 +28,10 @@ echo "%sudo ALL=NOPASSWD: /usr/bin/lxc-start" > /etc/sudoers.d/gitian-lxc
 echo "%sudo ALL=NOPASSWD: /usr/bin/lxc-execute" >> /etc/sudoers.d/gitian-lxc
 # make /etc/rc.local script that sets up bridge between guest and host
 echo '#!/bin/sh -e' > /etc/rc.local
-echo 'brctl addbr lxcbr0' >> /etc/rc.local
-echo 'ifconfig lxcbr0 10.0.3.2/24 up' >> /etc/rc.local
-echo 'iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE' >> /etc/rc.local
-echo 'echo 1 > /proc/sys/net/ipv4/ip_forward' >> /etc/rc.local
+echo 'brctl addbr br0' >> /etc/rc.local
+echo 'ip addr add 10.0.3.2/24 broadcast 10.0.3.255 dev br0' >> /etc/rc.local
+echo 'ip link set br0 up' >> /etc/rc.local
+echo 'firewall-cmd --zone=trusted --add-interface=br0' >> /etc/rc.local
 echo 'exit 0' >> /etc/rc.local
 # make sure that USE_LXC is always set when logging in as gitianuser,
 # and configure LXC IP addresses
@@ -70,9 +70,9 @@ Clone the git repositories for helix and Gitian.
 
 ```bash
 git clone https://github.com/devrandom/gitian-builder.git
-git clone https://github.com/projecthelixcoin/helix
-git clone https://github.com/projecthelixcoin/gitian.sigs.git
-git clone https://github.com/projecthelixcoin/helix-detached-sigs.git
+git clone https://github.com/helixproject/helix
+git clone https://github.com/helixproject/gitian.sigs.git
+git clone https://github.com/helixproject/helix-detached-sigs.git
 ```
 
 Setting up the Gitian image

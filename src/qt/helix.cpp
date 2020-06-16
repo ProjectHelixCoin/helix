@@ -564,8 +564,8 @@ int main(int argc, char* argv[])
     QTextCodec::setCodecForCStrings(QTextCodec::codecForTr());
 #endif
 
-    Q_INIT_RESOURCE(helix);
     Q_INIT_RESOURCE(helix_locale);
+    Q_INIT_RESOURCE(helix);
 
 #if QT_VERSION > 0x050100
     // Generate high-dpi pixmaps

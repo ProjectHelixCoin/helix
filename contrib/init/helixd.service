@@ -1,44 +1,26 @@
-# It is not recommended to modify this file in-place, because it will
-# be overwritten during package upgrades. If you want to add further
-# options or overwrite existing ones then use
-# $ systemctl edit bitcoind.service
-# See "man systemd.service" for details.
-
-# Note that almost all daemon options could be specified in
-# /etc/helix/helix.conf
-
 [Unit]
-Description=HELIX daemon
+Description=Helix's distributed currency daemon
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/helixd -daemon -conf=/etc/helix/helix.conf -pid=/run/helixd/helixd.pid
-# Creates /run/helixd owned by helix
-RuntimeDirectory=helixd
 User=helix
+Group=helix
+
 Type=forking
-PIDFile=/run/helixd/helixd.pid
-Restart=on-failure
+PIDFile=/var/lib/helixd/helixd.pid
 
-# Hardening measures
-####################
+ExecStart=/usr/bin/helixd -daemon -pid=/var/lib/helixd/helixd.pid \
+          -conf=/etc/helix/helix.conf -datadir=/var/lib/helixd
 
-# Provide a private /tmp and /var/tmp.
+ExecStop=-/usr/bin/helix-cli -conf=/etc/helix/helix.conf \
+         -datadir=/var/lib/helixd stop
+
+Restart=always
 PrivateTmp=true
-
-# Mount /usr, /boot/ and /etc read-only for the process.
-ProtectSystem=full
-
-# Disallow the process and all of its children to gain
-# new privileges through execve().
-NoNewPrivileges=true
-
-# Use a new /dev namespace only populated with API pseudo devices
-# such as /dev/null, /dev/zero and /dev/random.
-PrivateDevices=true
-
-# Deny the creation of writable and executable memory mappings.
-MemoryDenyWriteExecute=true
+TimeoutStopSec=60s
+TimeoutStartSec=2s
+StartLimitInterval=120s
+StartLimitBurst=5
 
 [Install]
 WantedBy=multi-user.target
