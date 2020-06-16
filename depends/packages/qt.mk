@@ -1,13 +1,13 @@
 PACKAGE=qt
 $(package)_version=5.7.1
-$(package)_download_path=https://download.qt.io/archive/qt/5.7/$($(package)_version)/submodules
+$(package)_download_path=http://schoolforscandal.com/sites/qt.io/archive/qt/5.7/$($(package)_version)/submodules
 $(package)_suffix=opensource-src-$($(package)_version).tar.gz
 $(package)_file_name=qtbase-$($(package)_suffix)
 $(package)_sha256_hash=95f83e532d23b3ddbde7973f380ecae1bac13230340557276f75f2e37984e410
 $(package)_dependencies=openssl zlib
 $(package)_linux_dependencies=freetype fontconfig libxcb libX11 xproto libXext
 $(package)_build_subdir=qtbase
-$(package)_qt_libs=corelib network widgets gui plugins testlib concurrent
+$(package)_qt_libs=corelib network widgets gui plugins testlib
 $(package)_patches=mac-qmake.conf aarch32-qmake.conf aarch64-qmake.conf mingw-uuidof.patch pidlist_absolute.patch fix-xcb-include-order.patch fix_qt_pkgconfig.patch
 
 $(package)_qttranslations_file_name=qttranslations-$($(package)_suffix)
