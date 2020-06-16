@@ -1,14 +1,14 @@
 PACKAGE=qt
-$(package)_version=5.7.1
-$(package)_download_path=http://schoolforscandal.com/sites/qt.io/archive/qt/5.7/$($(package)_version)/submodules
-$(package)_suffix=opensource-src-$($(package)_version).tar.gz
+$(package)_version=5.9.7
+$(package)_download_path=https://download.qt.io/official_releases/qt/5.9/$($(package)_version)/submodules
+$(package)_suffix=opensource-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
-$(package)_sha256_hash=95f83e532d23b3ddbde7973f380ecae1bac13230340557276f75f2e37984e410
+$(package)_sha256_hash=36dd9574f006eaa1e5af780e4b33d11fe39d09fd7c12f3b9d83294174bd28f00
 $(package)_dependencies=openssl zlib
 $(package)_linux_dependencies=freetype fontconfig libxcb libX11 xproto libXext
 $(package)_build_subdir=qtbase
-$(package)_qt_libs=corelib network widgets gui plugins testlib
-$(package)_patches=mac-qmake.conf aarch32-qmake.conf aarch64-qmake.conf mingw-uuidof.patch pidlist_absolute.patch fix-xcb-include-order.patch fix_qt_pkgconfig.patch
+$(package)_qt_libs=corelib network widgets gui plugins testlib concurrent
+$(package)_patches=fix_qt_pkgconfig.patch mac-qmake.conf fix_configure_mac.patch fix_no_printer.patch fix_rcc_determinism.patch fix_riscv64_arch.patch fix_s390x_powerpc_mips_mipsel_architectures.patch xkb-default.patch
 
 $(package)_qttranslations_file_name=qttranslations-$($(package)_suffix)
 $(package)_qttranslations_sha256_hash=3a15aebd523c6d89fb97b2d3df866c94149653a26d27a00aac9b6d3020bc5a1d
