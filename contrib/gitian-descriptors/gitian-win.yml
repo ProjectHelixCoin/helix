@@ -1,8 +1,9 @@
 ---
 name: "helix-win-1.3"
 enable_cache: true
+distro: "ubuntu"
 suites:
-- "trusty"
+- "bionic"
 architectures:
 - "amd64"
 packages:
