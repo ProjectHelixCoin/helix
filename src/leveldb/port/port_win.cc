@@ -70,8 +70,8 @@ void Mutex::AssertHeld() {
 CondVar::CondVar(Mutex* mu) :
     waiting_(0), 
     mu_(mu), 
-    sem1_(::CreateSemahelix(NULL, 0, 10000, NULL)),
-    sem2_(::CreateSemahelix(NULL, 0, 10000, NULL)) {
+    sem1_(::CreateSemaphore(NULL, 0, 10000, NULL)),
+    sem2_(::CreateSemaphore(NULL, 0, 10000, NULL)) {
   assert(mu_);
 }
 
@@ -91,7 +91,7 @@ void CondVar::Wait() {
 
   // initiate handshake
   ::WaitForSingleObject(sem1_, INFINITE);
-  ::ReleaseSemahelix(sem2_, 1, NULL);
+  ::ReleaseSemaphore(sem2_, 1, NULL);
   mu_->Lock();
 }
 
@@ -101,7 +101,7 @@ void CondVar::Signal() {
     --waiting_;
 
     // finalize handshake
-    ::ReleaseSemahelix(sem1_, 1, NULL);
+    ::ReleaseSemaphore(sem1_, 1, NULL);
     ::WaitForSingleObject(sem2_, INFINITE);
   }
   wait_mtx_.Unlock();
@@ -109,7 +109,7 @@ void CondVar::Signal() {
 
 void CondVar::SignalAll() {
   wait_mtx_.Lock();
-  ::ReleaseSemahelix(sem1_, waiting_, NULL);
+  ::ReleaseSemaphore(sem1_, waiting_, NULL);
   while(waiting_ > 0) {
     --waiting_;
     ::WaitForSingleObject(sem2_, INFINITE);
