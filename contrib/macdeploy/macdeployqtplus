@@ -603,7 +603,7 @@ else:
 
 # ------------------------------------------------
 
-target = os.path.join("dist", "HELIX-Qt.app")
+target = os.path.join("dist", "Helix-Qt.app")
 
 if verbose >= 2:
     print("+ Copying source bundle +")
