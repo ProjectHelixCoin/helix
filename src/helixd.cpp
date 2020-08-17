@@ -12,12 +12,11 @@
 #include "main.h"
 #include "noui.h"
 #include "scheduler.h"
-#include "rpcserver.h"
+#include "rpc/server.h"
 #include "ui_interface.h"
 #include "util.h"
 #include "httpserver.h"
 #include "httprpc.h"
-#include "rpcserver.h"
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/filesystem.hpp>
@@ -82,7 +81,7 @@ bool AppInit(int argc, char* argv[])
             strUsage += LicenseInfo();
         } else {
             strUsage += "\n" + _("Usage:") + "\n" +
-                        "  Helixd [options]                     " + _("Start Helix Core Daemon") + "\n";
+                        "  helixd [options]                     " + _("Start Helix Core Daemon") + "\n";
 
             strUsage += "\n" + HelpMessage(HMM_BITCOIND);
         }
@@ -111,11 +110,11 @@ bool AppInit(int argc, char* argv[])
         // Command-line RPC
         bool fCommandLine = false;
         for (int i = 1; i < argc; i++)
-            if (!IsSwitchChar(argv[i][0]) && !boost::algorithm::istarts_with(argv[i], "Helix:"))
+            if (!IsSwitchChar(argv[i][0]) && !boost::algorithm::istarts_with(argv[i], "helix:"))
                 fCommandLine = true;
 
         if (fCommandLine) {
-            fprintf(stderr, "Error: There is no RPC client functionality in Helixd anymore. Use the Helix-cli utility instead.\n");
+            fprintf(stderr, "Error: There is no RPC client functionality in helixd anymore. Use the helix-cli utility instead.\n");
             exit(1);
         }
 #ifndef WIN32
@@ -142,7 +141,8 @@ bool AppInit(int argc, char* argv[])
 #endif
         SoftSetBoolArg("-server", true);
 
-        fRet = AppInit2(threadGroup, scheduler);
+        std::vector<std::string> words;
+        fRet = AppInit2(threadGroup, scheduler, words);
     } catch (std::exception& e) {
         PrintExceptionContinue(&e, "AppInit()");
     } catch (...) {
@@ -166,7 +166,7 @@ int main(int argc, char* argv[])
 {
     SetupEnvironment();
 
-    // Connect Helixd signal handlers
+    // Connect helixd signal handlers
     noui_connect();
 
     return (AppInit(argc, argv) ? 0 : 1);

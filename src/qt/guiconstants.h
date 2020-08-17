@@ -51,7 +51,7 @@ static const int MAX_URI_LENGTH = 255;
 #define SPINNER_FRAMES 35
 
 #define QAPP_ORG_NAME "Helix"
-#define QAPP_ORG_DOMAIN "helix.org"
+#define QAPP_ORG_DOMAIN "helix-crypto.com."
 #define QAPP_APP_NAME_DEFAULT "Helix-Qt"
 #define QAPP_APP_NAME_TESTNET "Helix-Qt-testnet"
 

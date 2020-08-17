@@ -441,9 +441,9 @@ SOURCES += src/activemasternode.cpp \
            src/utilmoneystr.cpp \
            src/utilstrencodings.cpp \
            src/utiltime.cpp \
-           src/wallet.cpp \
-           src/wallet_ismine.cpp \
-           src/walletdb.cpp \
+           src/wallet/wallet.cpp \
+           src/wallet/wallet_ismine.cpp \
+           src/wallet/walletdb.cpp \
            src/validationinterface.cpp \
            src/consensus/merkle.cpp \
            src/compat/glibc_compat.cpp \
@@ -657,10 +657,7 @@ SOURCES += src/activemasternode.cpp \
            src/leveldb/helpers/memenv/memenv.cc \
            src/leveldb/helpers/memenv/memenv_test.cc \
            src/secp256k1/src/java/org_bitcoin_NativeSecp256k1.c
-	   
-RESOURCES += 	\
-		../src/qt/helix.qrc \
-		../src/qt/helix_locale.qrc
+RESOURCES += src/qt/helix.qrc src/qt/helix_locale.qrc
 
 TRANSLATIONS += src/qt/locale/helix_bg.ts \
                 src/qt/locale/helix_de.ts \

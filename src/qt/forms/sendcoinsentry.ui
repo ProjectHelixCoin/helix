@@ -62,6 +62,12 @@
         <property name="placeholderText">
          <string>Enter a Helix address (e.g. PCYiHgGJJ6xGHqivmdZrYjRnhaYf6AJ2Mp)</string>
         </property>
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="placeholderText">
+         <string>Enter a Helix address (e.g. PCYiHgGJJ6xGHqivmdZrYjRnhaYf6AJ2Mp)</string>
+        </property>
        </widget>
       </item>
       <item>

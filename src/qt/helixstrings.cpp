@@ -8,7 +8,7 @@
 #else
 #define UNUSED
 #endif
-static const char UNUSED *Helix_strings[] = {
+static const char UNUSED *helix_strings[] = {
 QT_TRANSLATE_NOOP("Helix-core", " mints deleted\n"),
 QT_TRANSLATE_NOOP("Helix-core", " mints updated, "),
 QT_TRANSLATE_NOOP("Helix-core", " unconfirmed transactions removed\n"),
@@ -56,7 +56,7 @@ QT_TRANSLATE_NOOP("Helix-core", ""
 "Distributed under the MIT software license, see the accompanying file "
 "COPYING or <http://www.opensource.org/licenses/mit-license.php>."),
 QT_TRANSLATE_NOOP("Helix-core", ""
-"Enable automatic wallet backups triggered after each zPhr minting (0-1, "
+"Enable automatic wallet backups triggered after each zHlix minting (0-1, "
 "default: %u)"),
 QT_TRANSLATE_NOOP("Helix-core", ""
 "Enable spork administration functionality with the appropriate private key."),

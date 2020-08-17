@@ -110,28 +110,28 @@ BITCOIN_CORE_H = \
   checkpoints.h \
   checkqueue.h \
   clientversion.h \
-  coincontrol.h \
   coins.h \
   compat.h \
+  compat/cpuid.h \
   compat/sanity.h \
   consensus/merkle.h \
   consensus/validation.h \
   compressor.h \
+  cuckoocache.h \
   primitives/block.h \
   primitives/deterministicmint.h \
   primitives/transaction.h \
   primitives/zerocoin.h \
   core_io.h \
-  crypter.h \
   denomination_functions.h \
   obfuscation.h \
   obfuscation-relay.h \
-  db.h \
   eccryptoverify.h \
   ecwrapper.h \
   hash.h \
   httprpc.h \
   httpserver.h \
+  indirectmap.h \
   init.h \
   kernel.h \
   swifttx.h \
@@ -159,9 +159,9 @@ BITCOIN_CORE_H = \
   random.h \
   reverselock.h \
   reverse_iterate.h \
-  rpcclient.h \
-  rpcprotocol.h \
-  rpcserver.h \
+  rpc/client.h \
+  rpc/protocol.h \
+  rpc/server.h \
   scheduler.h \
   script/interpreter.h \
   script/script.h \
@@ -171,10 +171,10 @@ BITCOIN_CORE_H = \
   script/script_error.h \
   serialize.h \
   support/allocators/zeroafterfree.h \
-  support/cleanse.h \
   spork.h \
   sporkdb.h \
   streams.h \
+  support/cleanse.h \
   sync.h \
   threadsafety.h \
   timedata.h \
@@ -190,12 +190,20 @@ BITCOIN_CORE_H = \
   utilmoneystr.h \
   utiltime.h \
   validationinterface.h \
+  utilsplitstring.h \
   version.h \
-  wallet.h \
-  wallet_ismine.h \
-  walletdb.h \
   zhlixtracker.h \
   zhlixwallet.h \
+  wallet/arrayslice.h \
+  wallet/bip39_english.h \
+  wallet/bip39.h \
+  wallet/coincontrol.h \
+  wallet/crypter.h \
+  wallet/db.h \
+  wallet/hdchain.h \
+  wallet/wallet.h \
+  wallet/walletdb.h \
+  wallet/wallet_ismine.h \
   zmq/zmqabstractnotifier.h \
   zmq/zmqconfig.h \
   zmq/zmqnotificationinterface.h \
@@ -227,21 +235,22 @@ libbitcoin_server_a_SOURCES = \
   noui.cpp \
   pow.cpp \
   rest.cpp \
-  rpcblockchain.cpp \
-  rpcmasternode.cpp \
-  rpcmasternode-budget.cpp \
-  rpcmining.cpp \
-  rpcmisc.cpp \
-  rpcnet.cpp \
-  rpcrawtransaction.cpp \
-  rpcserver.cpp \
   script/sigcache.cpp \
   sporkdb.cpp \
   timedata.cpp \
   torcontrol.cpp \
   txdb.cpp \
   txmempool.cpp \
+  ui_interface.cpp \
   validationinterface.cpp \
+  rpc/blockchain.cpp \
+  rpc/masternode.cpp \
+  rpc/budget.cpp \
+  rpc/mining.cpp \
+  rpc/misc.cpp \
+  rpc/net.cpp \
+  rpc/rawtransaction.cpp \
+  rpc/server.cpp \
   $(BITCOIN_CORE_H)
 
 if ENABLE_ZMQ
@@ -263,8 +272,6 @@ libbitcoin_wallet_a_SOURCES = \
   denomination_functions.cpp \
   obfuscation.cpp \
   obfuscation-relay.cpp \
-  db.cpp \
-  crypter.cpp \
   swifttx.cpp \
   masternode.cpp \
   masternode-budget.cpp \
@@ -273,16 +280,18 @@ libbitcoin_wallet_a_SOURCES = \
   masternodeconfig.cpp \
   masternodeman.cpp \
   mintpool.cpp \
-  rpcdump.cpp \
   primitives/deterministicmint.cpp \
   primitives/zerocoin.cpp \
-  rpcwallet.cpp \
   kernel.cpp \
-  wallet.cpp \
-  wallet_ismine.cpp \
-  walletdb.cpp \
   zhlixwallet.cpp \
   zhlixtracker.cpp \
+  wallet/crypter.cpp \
+  wallet/db.cpp \
+  wallet/rpcdump.cpp \
+  wallet/rpcwallet.cpp \
+  wallet/wallet.cpp \
+  wallet/walletdb.cpp \
+  wallet/wallet_ismine.cpp \
   $(BITCOIN_CORE_H)
 
 # crypto primitives library
@@ -291,8 +300,11 @@ crypto_libbitcoin_crypto_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/sha1.cpp \
   crypto/sha256.cpp \
+  crypto/sha256_sse4.cpp \
   crypto/sha512.cpp \
   crypto/hmac_sha256.cpp \
+  crypto/pkcs5_pbkdf2.h \
+  crypto/pkcs5_pbkdf2.cpp \
   crypto/rfc6979_hmac_sha256.cpp \
   crypto/hmac_sha512.cpp \
   crypto/scrypt.cpp \
@@ -358,6 +370,7 @@ libbitcoin_common_a_SOURCES = \
   amount.cpp \
   base58.cpp \
   bech32.cpp \
+  wallet/bip39.cpp \
   bip38.cpp \
   chainparams.cpp \
   coins.cpp \
@@ -383,7 +396,7 @@ libbitcoin_common_a_SOURCES = \
   script/sign.cpp \
   script/standard.cpp \
   script/script_error.cpp \
-  support/cleanse.cpp \
+  wallet/hdchain.cpp \
   spork.cpp \
   sporkdb.cpp \
   $(BITCOIN_CORE_H)
@@ -401,7 +414,8 @@ libbitcoin_util_a_SOURCES = \
   chainparamsbase.cpp \
   clientversion.cpp \
   random.cpp \
-  rpcprotocol.cpp \
+  rpc/protocol.cpp \
+  support/cleanse.cpp \
   sync.cpp \
   uint256.cpp \
   util.cpp \
@@ -418,7 +432,7 @@ endif
 libbitcoin_cli_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libbitcoin_cli_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_cli_a_SOURCES = \
-  rpcclient.cpp \
+  rpc/client.cpp \
   $(BITCOIN_CORE_H)
 
 nodist_libbitcoin_util_a_SOURCES = $(srcdir)/obj/build.h
@@ -565,3 +579,4 @@ endif
 if ENABLE_QT_TESTS
 include Makefile.qttest.include
 endif
+

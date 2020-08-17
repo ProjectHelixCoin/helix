@@ -108,6 +108,18 @@ typedef boost::condition_variable CConditionVariable;
 void PrintLockContention(const char* pszName, const char* pszFile, int nLine);
 #endif
 
+//#define DEBUG_LOCKBENCHMARK
+
+#ifdef DEBUG_LOCKBENCHMARK
+void BeforeAcquireLock(const void * lockInstance, const void * mutexInstance, const char* pszName, const char* pszFile, int nLine, bool fTry);
+void AfterAcquireLock(const void * lockInstance, const bool ownsLock);
+void AfterReleaseLock(const void * lockInstance, const bool ownsLock);
+#else
+#define BeforeAcquireLock(lockInstance, mutexInstance, pszName, pszFile, nLine, fTry)
+#define AfterAcquireLock(lockInstance, ownsLock)
+#define AfterReleaseLock(lockInstance, ownsLock)
+#endif
+
 /** Wrapper around boost::unique_lock<CCriticalSection> */
 template <typename Mutex>
 class SCOPED_LOCKABLE CMutexLock
@@ -140,27 +152,37 @@ private:
 public:
     CMutexLock(Mutex& mutexIn, const char* pszName, const char* pszFile, int nLine, bool fTry = false) EXCLUSIVE_LOCK_FUNCTION(mutexIn) : lock(mutexIn, boost::defer_lock)
     {
+		BeforeAcquireLock(this, &mutexIn, pszName, pszFile, nLine, fTry);
+
         if (fTry)
             TryEnter(pszName, pszFile, nLine);
         else
             Enter(pszName, pszFile, nLine);
+		
+		AfterAcquireLock(this, lock.owns_lock());
     }
 
     CMutexLock(Mutex* pmutexIn, const char* pszName, const char* pszFile, int nLine, bool fTry = false) EXCLUSIVE_LOCK_FUNCTION(pmutexIn)
     {
         if (!pmutexIn) return;
 
+		BeforeAcquireLock(this, pmutexIn, pszName, pszFile, nLine, fTry);
+
         lock = boost::unique_lock<Mutex>(*pmutexIn, boost::defer_lock);
         if (fTry)
             TryEnter(pszName, pszFile, nLine);
         else
             Enter(pszName, pszFile, nLine);
+		
+		AfterAcquireLock(this, lock.owns_lock());
     }
 
     ~CMutexLock() UNLOCK_FUNCTION()
     {
         if (lock.owns_lock())
             LeaveCritical();
+		
+		AfterReleaseLock(this, lock.owns_lock());
     }
 
     operator bool()
@@ -190,7 +212,7 @@ typedef CMutexLock<CCriticalSection> CCriticalBlock;
         LeaveCritical();           \
     }
 
-class CSemaphore
+class CSemahelix
 {
 private:
     boost::condition_variable condition;
@@ -198,7 +220,7 @@ private:
     int value;
 
 public:
-    CSemaphore(int init) : value(init) {}
+    CSemahelix(int init) : value(init) {}
 
     void wait()
     {
@@ -228,11 +250,11 @@ public:
     }
 };
 
-/** RAII-style Semaphore lock */
-class CSemaphoreGrant
+/** RAII-style Semahelix lock */
+class CSemahelixGrant
 {
 private:
-    CSemaphore* sem;
+    CSemahelix* sem;
     bool fHaveGrant;
 
 public:
@@ -259,7 +281,7 @@ public:
         return fHaveGrant;
     }
 
-    void MoveTo(CSemaphoreGrant& grant)
+    void MoveTo(CSemahelixGrant& grant)
     {
         grant.Release();
         grant.sem = sem;
@@ -268,9 +290,9 @@ public:
         fHaveGrant = false;
     }
 
-    CSemaphoreGrant() : sem(NULL), fHaveGrant(false) {}
+    CSemahelixGrant() : sem(NULL), fHaveGrant(false) {}
 
-    CSemaphoreGrant(CSemaphore& sema, bool fTry = false) : sem(&sema), fHaveGrant(false)
+    CSemahelixGrant(CSemahelix& sema, bool fTry = false) : sem(&sema), fHaveGrant(false)
     {
         if (fTry)
             TryAcquire();
@@ -278,7 +300,7 @@ public:
             Acquire();
     }
 
-    ~CSemaphoreGrant()
+    ~CSemahelixGrant()
     {
         Release();
     }

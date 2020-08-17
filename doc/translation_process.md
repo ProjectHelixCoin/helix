@@ -1,14 +1,14 @@
 Translations
 ============
 
-The HELIX Core project has been designed to support multiple localisations. This makes adding new phrases, and completely new languages easily achievable. For managing all application translations, HELIX Core makes use of the Transifex online translation management tool.
+The Helix Core project has been designed to support multiple localisations. This makes adding new phrases, and completely new languages easily achievable. For managing all application translations, Helix Core makes use of the Transifex online translation management tool.
 
 ### Helping to translate (using Transifex)
 Transifex is setup to monitor the GitHub repo for updates, and when code containing new translations is found, Transifex will process any changes. It may take several hours after a pull-request has been merged, to appear in the Transifex web interface.
 
-Multiple language support is critical in assisting HELIX's global adoption, and growth. One of HELIX's greatest strengths is cross-border money transfers, any help making that easier is greatly appreciated.
+Multiple language support is critical in assisting Helix's global adoption, and growth. One of Helix's greatest strengths is cross-border money transfers, any help making that easier is greatly appreciated.
 
-See the [Transifex HELIX project](https://www.transifex.com/projecthelixcoin/projecthelixcoin-translations/) to assist in translations.
+See the [Transifex Helix project](https://www.transifex.com/helix-project/helix-project-translations/) to assist in translations.
 
 ### Writing code with translations
 We use automated scripts to help extract translations in both Qt, and non-Qt source files. It is rarely necessary to manually edit the files in `src/qt/locale/`. The translation source files must adhere to the following format:
@@ -43,14 +43,16 @@ git commit
 ### Creating a Transifex account
 Visit the [Transifex Signup](https://www.transifex.com/signup/) page to create an account. Take note of your username and password, as they will be required to configure the command-line tool.
 
-You can find the HELIX translation project at [https://www.transifex.com/projecthelixcoin/projecthelixcoin-translations/](https://www.transifex.com/projecthelixcoin/projecthelixcoin-translations/).
+You can find the Helix translation project at [https://www.transifex.com/helix-project/helix-project-translations/](https://www.transifex.com/helix-project/helix-project-translations/).
 
 ### Installing the Transifex client command-line tool
-The client is used to fetch updated translations. If you are having problems, or need more details, see [https://docs.transifex.com/client/installing-the-client](https://docs.transifex.com/client/installing-the-client)
+The client it used to fetch updated translations. If you are having problems, or need more details, see [http://docs.transifex.com/developer/client/setup](http://docs.transifex.com/developer/client/setup)
+
+**For Linux and Mac**
 
 `pip install transifex-client`
 
-Setup your Transifex client config as follows. Please *ignore the token field*.
+Setup your transifex client config as follows. Please *ignore the token field*.
 
 ```ini
 nano ~/.transifexrc
@@ -62,21 +64,21 @@ token =
 username = USERNAME
 ```
 
-The Transifex HELIX project config file is included as part of the repo. It can be found at `.tx/config`, however you shouldn’t need to change anything.
+**For Windows**
+
+Please see [http://docs.transifex.com/developer/client/setup#windows](http://docs.transifex.com/developer/client/setup#windows) for details on installation.
+
+The Transifex Helix project config file is included as part of the repo. It can be found at `.tx/config`, however you shouldn’t need change anything.
 
 ### Synchronising translations
 To assist in updating translations, we have created a script to help.
 
 1. `python contrib/devtools/update-translations.py`
-2. `git add` new translations from `src/qt/locale/`
-3. Update `src/qt/helix_locale.qrc` manually or via
-```bash
-git ls-files src/qt/locale/*ts|xargs -n1 basename|sed 's/\(helix_\(.*\)\).ts/<file alias="\2">locale\/\1.qm<\/file>/'
-```
-4. Update `src/Makefile.qt_locale.include` manually or via
-```bash
-git ls-files src/qt/locale/*ts|xargs -n1 basename|sed 's/\(helix_\(.*\)\).ts/  qt\/locale\/\1.ts \\/'
-```
+2. Update `src/qt/helix_locale.qrc` manually or via
+   `ls src/qt/locale/*ts|xargs -n1 basename|sed 's/\(helix_\(.*\)\).ts/<file alias="\2">locale\/\1.qm<\/file>/'`
+3. Update `src/Makefile.qt.include` manually or via
+   `ls src/qt/locale/*ts|xargs -n1 basename|sed 's/\(helix_\(.*\)\).ts/  qt\/locale\/\1.ts \\/'`
+4. `git add` new translations from `src/qt/locale/`
 
 **Do not directly download translations** one by one from the Transifex website, as we do a few post-processing steps before committing the translations.
 
@@ -104,6 +106,6 @@ To create a new language template, you will need to edit the languages manifest 
 **Note:** that the language translation file **must end in `.qm`** (the compiled extension), and not `.ts`.
 
 ### Questions and general assistance
-The HELIX Core translation maintainers include *Fuzzbawls*. You can find them, and others, in the [HELIX Discord](https://discord.helix.org).
+The Helix Core translation maintainers include *Fuzzbawls and s3v3nh4cks*. You can find them, and others, in the [Helix Slack](https://helix.slack.com).
 
 Announcements will be posted during application pre-releases to notify translators to check for updates.

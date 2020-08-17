@@ -1,30 +1,30 @@
-HELIX Core version 3.0.2 is now available from:
+PIVX Core version 3.0.2 is now available from:
 
-  <https://github.com/projecthelixcoin/helix/releases>
+  <https://github.com/pivx-project/pivx/releases>
 
 This is a new minor-revision version release, including various bug fixes and
 performance improvements, as well as updated translations.
 
 Please report bugs using the issue tracker at github:
 
-  <https://github.com/projecthelixcoin/helix/issues>
+  <https://github.com/pivx-project/pivx/issues>
 
 Recommended Update
 ==============
 
-HELIX Core v3.0.2 is a recommended, semi-mandatory update for all users. This release contains transaction creation bug fixes for zPIV spends, automint calculation adjustments, and other various updates/fixes.
+PIVX Core v3.0.2 is a recommended, semi-mandatory update for all users. This release contains transaction creation bug fixes for zPIV spends, automint calculation adjustments, and other various updates/fixes.
 
 zPIV spending requires this update.
 
 How to Upgrade
 ==============
 
-If you are running an older version, shut it down. Wait until it has completely shut down (which might take a few minutes for older versions), then run the installer (on Windows) or just copy over /Applications/HELIX-Qt (on Mac) or helixd/helix-qt (on Linux).
+If you are running an older version, shut it down. Wait until it has completely shut down (which might take a few minutes for older versions), then run the installer (on Windows) or just copy over /Applications/PIVX-Qt (on Mac) or pivxd/pivx-qt (on Linux).
 
 Compatibility
 ==============
 
-HELIX Core is extensively tested on multiple operating systems using
+PIVX Core is extensively tested on multiple operating systems using
 the Linux kernel, macOS 10.8+, and Windows Vista and later.
 
 Microsoft ended support for Windows XP on [April 8th, 2014](https://www.microsoft.com/en-us/WindowsForBusiness/end-of-xp-support),
@@ -32,7 +32,7 @@ No attempt is made to prevent installing or running the software on Windows XP, 
 can still do so at your own risk but be aware that there are known instabilities and issues.
 Please do not report issues about Windows XP to the issue tracker.
 
-HELIX Core should also work on most other Unix-like systems but is not
+PIVX Core should also work on most other Unix-like systems but is not
 frequently tested on them.
 
 ### :exclamation::exclamation::exclamation: MacOS 10.13 High Sierra :exclamation::exclamation::exclamation:
@@ -47,7 +47,7 @@ Auto Wallet Backup
 ---------------------
 In addition to the automatic wallet backup that is done at each start of the client, a new automatic backup function has been added that will, by default, create a backup of the wallet file during each zPIV mint operation (zPIV spends which re-mint their change are also included in this). This functionality is controlled by the `-backupzpiv` command-line option, which defaults to `1` (enabled, auto-backup).
 
-Users that wish to prevent this behavior (not recommended) can pass `-backupzpiv=0` at the command-line when starting the client, or add `backupzpiv=0` to their `helix.conf` file.
+Users that wish to prevent this behavior (not recommended) can pass `-backupzpiv=0` at the command-line when starting the client, or add `backupzpiv=0` to their `pivx.conf` file.
 
 zPIV Automint Calculations
 ---------------------
@@ -71,7 +71,7 @@ Due to the aforementioned issue with zPIV spending, users may find that their at
 
 RPC Changes
 ---------------------
-The `bip38decrypt` command has had it's parameter order changed to be more consistent with it's counterpart. The command now expects the HELIX address as it's first parameter and the passphrase as it's second parameter.
+The `bip38decrypt` command has had it's parameter order changed to be more consistent with it's counterpart. The command now expects the PIVX address as it's first parameter and the passphrase as it's second parameter.
 
 Bip38 Compatibility With 3rd Party Tools
 ---------------------
@@ -125,4 +125,4 @@ Thanks to everyone who directly contributed to this release:
 - rejectedpromise
 - Warrows
 
-As well as everyone that helped translating on [Transifex](https://www.transifex.com/projects/p/projecthelixcoin-translations/).
+As well as everyone that helped translating on [Transifex](https://www.transifex.com/projects/p/pivx-project-translations/).

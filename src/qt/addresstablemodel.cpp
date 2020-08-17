@@ -10,7 +10,7 @@
 #include "walletmodel.h"
 
 #include "base58.h"
-#include "wallet.h"
+#include "wallet/wallet.h"
 
 #include <QDebug>
 #include <QFont>
@@ -81,7 +81,7 @@ public:
         cachedAddressTable.clear();
         {
             LOCK(wallet->cs_wallet);
-            BOOST_FOREACH (const PAIRTYPE(CTxDestination, CAddressBookData) & item, wallet->mapAddressBook) {
+            for (const PAIRTYPE(CTxDestination, CAddressBookData) & item : wallet->mapAddressBook) {
                 const CTxDestination& address = item.first;
                 const CScript redeemDestination = GetScriptForDestination(address);
                 bool fMine = IsMine(*wallet, redeemDestination);
@@ -383,14 +383,14 @@ QString AddressTableModel::addRow(const QString& type, const QString& label, con
     } else if (type == Receive) {
         // Generate a new address to associate with given label
         CPubKey newKey;
-        if (!wallet->GetKeyFromPool(newKey)) {
+        if (!wallet->GetKeyFromPool(newKey, false)) {
             WalletModel::UnlockContext ctx(walletModel->requestUnlock(true));
             if (!ctx.isValid()) {
                 // Unlock wallet failed or was cancelled
                 editStatus = WALLET_UNLOCK_FAILURE;
                 return QString();
             }
-            if (!wallet->GetKeyFromPool(newKey)) {
+            if (!wallet->GetKeyFromPool(newKey, false)) {
                 editStatus = KEY_GENERATION_FAILURE;
                 return QString();
             }

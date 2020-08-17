@@ -72,6 +72,7 @@ private:
     ProposalList *proposalListPage;	
 
     TransactionView* transactionView;
+    ProposalList *proposalList;
 
     QProgressDialog* progressDialog;
     QLabel* transactionSum;
@@ -143,6 +144,8 @@ signals:
     void message(const QString& title, const QString& message, unsigned int style);
     /** Encryption status of wallet changed */
     void encryptionStatusChanged(int status);
+    /** HD-Enabled status of wallet changed (only possible during startup) */
+    void hdEnabledStatusChanged(int hdEnabled);
     /** Notify that a new transaction appeared */
     void incomingTransaction(const QString& date, int unit, const CAmount& amount, const QString& type, const QString& address);
 };

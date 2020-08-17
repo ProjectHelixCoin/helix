@@ -1,3 +1,2 @@
 usr/local/bin/helixd usr/bin
 usr/local/bin/helix-cli usr/bin
-debian/examples/helix.conf etc/helix
