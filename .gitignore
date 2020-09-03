@@ -38,6 +38,7 @@ confdefs.h
 conftest.cpp
 conftest.err
 libtool
+.vscode
 src/config/helix-config.h
 src/config/helix-config.h.in
 src/config/stamp-h1
@@ -85,7 +86,7 @@ src/leveldb/build_config.mk
 *.qm
 Makefile
 helix-qt
-helix-Qt.app
+Helix-Qt.app
 
 # Unit-tests
 Makefile.test
@@ -118,12 +119,19 @@ qa/pull-tester/tests-config.sh
 qa/pull-tester/cache/*
 qa/pull-tester/test.*/*
 
+# Generated images
+background.tiff
+background.tiff.png
+background.tiff@2x.png
+
 .cproject
 .project
 /doc/doxygen/
+/doc/Doxyfile
 /nbproject/
 
 .idea
 cmake-build-debug
 
 cache
+*.autosave

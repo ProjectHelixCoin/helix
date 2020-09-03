@@ -26,6 +26,8 @@ public:
 
     void setProposalStart(const CAmount& minimum);
     void setProposalEnd(const CAmount& minimum);
+    void setTotalPaymentCount(const int& count);
+    void setRemainingPaymentCount(const int& count);
     void setProposal(const QString &proposal);
     
     void setMinAmount(const CAmount& minimum);
@@ -42,6 +44,8 @@ protected:
 private:
     CAmount startDate;
     CAmount endDate;
+    int totalPaymentCount;
+    int remainingPaymentCount;
     QString proposalName;
     CAmount minAmount;
     CAmount votesNeeded;

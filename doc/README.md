@@ -22,7 +22,7 @@ Unpack the files into a directory, and then run helix-qt.exe.
 
 ### macOS
 
-Drag HELIX-Qt to your applications folder, and then run HELIX-Qt.
+Drag Helix-Qt to your applications folder, and then run Helix-Qt.
 
 ### Need Help?
 

@@ -18,13 +18,14 @@
 #include "sync.h"
 #include "utilstrencodings.h"
 #include "utiltime.h"
+// to be removed
+#include "ui_interface.h"
 
 #include <stdarg.h>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <openssl/bio.h>
 #include <openssl/buffer.h>
-#include <openssl/crypto.h> // for OPENSSL_cleanse()
 #include <openssl/evp.h>
 
 
@@ -82,7 +83,7 @@
 #include <boost/algorithm/string/predicate.hpp> // for startswith() and endswith()
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
-#include <boost/foreach.hpp>
+
 #include <boost/program_options/detail/config_file.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/thread.hpp>
@@ -182,7 +183,10 @@ public:
     ~CInit()
     {
         // Securely erase the memory used by the PRNG
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+#else
         RAND_cleanup();
+#endif
         // Shutdown OpenSSL library multithreading support
         CRYPTO_set_locking_callback(NULL);
         for (int i = 0; i < CRYPTO_num_locks(); i++)
@@ -245,6 +249,8 @@ bool LogAcceptCategory(const char* category)
                 ptrCategory->insert(string("mnpayments"));
                 ptrCategory->insert(string("zero"));
                 ptrCategory->insert(string("mnbudget"));
+                ptrCategory->insert(string("precompute"));
+                ptrCategory->insert(string("staking"));
             }
         }
         const set<string>& setCategories = *ptrCategory.get();
@@ -573,6 +579,18 @@ boost::filesystem::path GetDefaultDataDir()
 static boost::filesystem::path pathCached;
 static boost::filesystem::path pathCachedNetSpecific;
 static CCriticalSection csPathCached;
+
+bool CheckIfWalletDatExists(bool fNetSpecific) {
+
+    namespace fs = boost::filesystem;
+
+    std::string walletFile = GetArg("-wallet", "wallet.dat");
+    boost::filesystem::path path(walletFile);
+    if (!path.is_complete())
+        path = GetDataDir(fNetSpecific) / path;
+
+    return fs::exists(path);
+}
 
 const boost::filesystem::path& GetDataDir(bool fNetSpecific)
 {

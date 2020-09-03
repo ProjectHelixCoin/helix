@@ -12,12 +12,11 @@
 #include "main.h"
 #include "noui.h"
 #include "scheduler.h"
-#include "rpcserver.h"
+#include "rpc/server.h"
 #include "ui_interface.h"
 #include "util.h"
 #include "httpserver.h"
 #include "httprpc.h"
-#include "rpcserver.h"
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/filesystem.hpp>
@@ -142,7 +141,8 @@ bool AppInit(int argc, char* argv[])
 #endif
         SoftSetBoolArg("-server", true);
 
-        fRet = AppInit2(threadGroup, scheduler);
+        std::vector<std::string> words;
+        fRet = AppInit2(threadGroup, scheduler, words);
     } catch (std::exception& e) {
         PrintExceptionContinue(&e, "AppInit()");
     } catch (...) {

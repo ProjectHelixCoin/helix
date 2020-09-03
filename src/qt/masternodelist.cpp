@@ -17,7 +17,7 @@
 #include "masternodeconfig.h"
 #include "masternodeman.h"
 #include "sync.h"
-#include "wallet.h"
+#include "wallet/wallet.h"
 #include "walletmodel.h"
 #include "util.h"
 
@@ -110,7 +110,7 @@ void MasternodeList::StartAlias(std::string strAlias)
     std::string strStatusHtml;
     strStatusHtml += "<center>Alias: " + strAlias;
 
-    BOOST_FOREACH (CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
+    for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
         if (mne.getAlias() == strAlias) {
             std::string strError;
             CMasternodeBroadcast mnb;
@@ -142,7 +142,7 @@ void MasternodeList::StartAll(std::string strCommand)
     int nCountFailed = 0;
     std::string strFailedHtml;
 
-    BOOST_FOREACH (CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
+    for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
         std::string strError;
         CMasternodeBroadcast mnb;
 
@@ -231,7 +231,7 @@ void MasternodeList::updateMyNodeList(bool fForce)
     nTimeMyListUpdated = GetTime();
 
     ui->tableWidgetMyMasternodes->setSortingEnabled(false);
-    BOOST_FOREACH (CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
+    for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
         int nIndex;
         if(!mne.castOutputIndex(nIndex))
             continue;
@@ -293,7 +293,7 @@ void MasternodeList::on_editConfigureMasternode_clicked()
     std::string strAlias = ui->tableWidgetMyMasternodes->item(nSelectedRow, 0)->text().toStdString();
 
 	int count = 0;
-    BOOST_FOREACH (CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
+    for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
 		count = count + 1;
 		if(strAlias == mne.getAlias()) {
 			MasternodeList::openEditConfigureMasternodePage(QString::fromStdString(mne.getAlias()), QString::fromStdString(mne.getIp()), QString::fromStdString(mne.getPrivKey()), QString::fromStdString(mne.getTxHash()), QString::fromStdString(mne.getOutputIndex()), count);
@@ -365,7 +365,7 @@ void MasternodeList::deleteAlias()
     int nSelectedRow = index.row();
     std::string strAlias = ui->tableWidgetMyMasternodes->item(nSelectedRow, 0)->text().toStdString();
 	int count = 0;
-    BOOST_FOREACH (CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
+    for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
 		count = count + 1;
 		if(strAlias == mne.getAlias()) {
 			vector<COutPoint> confLockedCoins;
@@ -411,7 +411,7 @@ void MasternodeList::copyAlias()
     int nSelectedRow = index.row();
     std::string strAlias = ui->tableWidgetMyMasternodes->item(nSelectedRow, 0)->text().toStdString();
 
-    BOOST_FOREACH (CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
+    for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
 		
 		if(strAlias == mne.getAlias()) {
 			

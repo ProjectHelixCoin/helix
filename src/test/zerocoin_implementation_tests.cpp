@@ -14,7 +14,7 @@
 #include <boost/test/unit_test.hpp>
 #include <iostream>
 #include <accumulators.h>
-#include "wallet.h"
+#include "wallet/wallet.h"
 #include "zhlixwallet.h"
 
 using namespace libzerocoin;
@@ -109,7 +109,7 @@ bool CheckZerocoinSpendNoDB(const CTransaction tx, string& strError)
     //max needed non-mint outputs should be 2 - one for redemption address and a possible 2nd for change
     if (tx.vout.size() > 2){
         int outs = 0;
-        for (const CTxOut out : tx.vout) {
+        for (const CTxOut& out : tx.vout) {
             if (out.IsZerocoinMint())
                 continue;
             outs++;
@@ -123,7 +123,7 @@ bool CheckZerocoinSpendNoDB(const CTransaction tx, string& strError)
 
     //compute the txout hash that is used for the zerocoinspend signatures
     CMutableTransaction txTemp;
-    for (const CTxOut out : tx.vout) {
+    for (const CTxOut& out : tx.vout) {
         txTemp.vout.push_back(out);
     }
     //    uint256 hashTxOut = txTemp.GetHash();
@@ -132,7 +132,7 @@ bool CheckZerocoinSpendNoDB(const CTransaction tx, string& strError)
     set<CBigNum> serials;
     list<CoinSpend> vSpends;
     CAmount nTotalRedeemed = 0;
-    BOOST_FOREACH(const CTxIn& txin, tx.vin) {
+    for (const CTxIn& txin : tx.vin) {
 
         //only check txin that is a zcspend
         if (!txin.scriptSig.IsZerocoinSpend())

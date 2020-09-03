@@ -82,7 +82,7 @@ void RunTest(const TestVector &test) {
     CExtPubKey pubkey;
     key.SetMaster(&seed[0], seed.size());
     pubkey = key.Neuter();
-    BOOST_FOREACH(const TestDerivation &derive, test.vDerive) {
+    for (const TestDerivation &derive : test.vDerive) {
         unsigned char data[74];
         key.Encode(data);
         pubkey.Encode(data);
@@ -104,6 +104,21 @@ void RunTest(const TestVector &test) {
         }
         key = keyNew;
         pubkey = pubkeyNew;
+        CDataStream ssPub(SER_DISK, CLIENT_VERSION);
+        ssPub << pubkeyNew;
+        BOOST_CHECK(ssPub.size() == BIP32_EXTKEY_SIZE+1);
+
+        CDataStream ssPriv(SER_DISK, CLIENT_VERSION);
+        ssPriv << keyNew;
+        BOOST_CHECK(ssPriv.size() == BIP32_EXTKEY_SIZE+1);
+
+        CExtPubKey pubCheck;
+        CExtKey privCheck;
+        ssPub >> pubCheck;
+        ssPriv >> privCheck;
+
+        BOOST_CHECK(pubCheck == pubkeyNew);
+        BOOST_CHECK(privCheck == keyNew);
     }
 }
 

@@ -60,7 +60,7 @@ bool IsBudgetCollateralValid(uint256 nTxCollateralHash, uint256 nExpectedHash, s
     findScript << OP_RETURN << ToByteVector(nExpectedHash);
 
     bool foundOpReturn = false;
-    BOOST_FOREACH (const CTxOut o, txCollateral.vout) {
+    for (const CTxOut o : txCollateral.vout) {
         if (!o.scriptPubKey.IsNormalPaymentScript() && !o.scriptPubKey.IsUnspendable()) {
             strError = strprintf("Invalid Script %s", txCollateral.ToString());
             LogPrint("mnbudget","CBudgetProposalBroadcast::IsBudgetCollateralValid - %s\n", strError);
@@ -173,7 +173,8 @@ void CBudgetManager::SubmitFinalBudget()
     // Submit final budget during the last 2 days (2880 blocks) before payment for Mainnet, about 9 minutes (9 blocks) for Testnet
     int finalizationWindow = ((GetBudgetPaymentCycleBlocks() / 30) * 2);
 
-    if (Params().NetworkID() == CBaseChainParams::TESTNET) {
+    if (Params().NetworkID() == CBaseChainParams::TESTNET
+        || Params().NetworkID() == CBaseChainParams::REGTEST) {
         // NOTE: 9 blocks for testnet is way to short to have any masternode submit an automatic vote on the finalized(!) budget,
         //       because those votes are only submitted/relayed once every 56 blocks in CFinalizedBudget::AutoCheck()
 
@@ -933,7 +934,9 @@ void CBudgetManager::NewBlock()
     TRY_LOCK(cs, fBudgetNewBlock);
     if (!fBudgetNewBlock) return;
 
-    if (masternodeSync.RequestedMasternodeAssets <= MASTERNODE_SYNC_BUDGET) return;
+    if (masternodeSync.RequestedMasternodeAssets <= MASTERNODE_SYNC_BUDGET
+        && Params().NetworkID() != CBaseChainParams::REGTEST)
+        return;
 
     if (strBudgetMode == "suggest") { //suggest the budget we see
         SubmitFinalBudget();
@@ -951,7 +954,7 @@ void CBudgetManager::NewBlock()
         }
 
         LOCK(cs_vNodes);
-        BOOST_FOREACH (CNode* pnode, vNodes)
+        for (CNode* pnode : vNodes)
             if (pnode->nVersion >= ActiveProtocol())
                 Sync(pnode, 0, true);
 
@@ -1124,7 +1127,7 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         mapSeenMasternodeBudgetVotes.insert(make_pair(vote.GetHash(), vote));
         if (!vote.SignatureValid(true)) {
             if (masternodeSync.IsSynced()) {
-            if (masternodeSync.IsSynced()) Misbehaving(pfrom->GetId(), 20);
+            //if (masternodeSync.IsSynced()) Misbehaving(pfrom->GetId(), 20);
                 LogPrintf("CBudgetManager::ProcessMessage() : mvote - signature invalid\n");
                 Misbehaving(pfrom->GetId(), 20);
             }
@@ -1954,7 +1957,6 @@ void CFinalizedBudget::CleanAndRemove(bool fSignatureCheck)
     }
 }
 
-
 CAmount CFinalizedBudget::GetTotalPayout()
 {
     CAmount ret = 0;
@@ -1971,7 +1973,7 @@ std::string CFinalizedBudget::GetProposals()
     LOCK(cs);
     std::string ret = "";
 
-    BOOST_FOREACH (CTxBudgetPayment& budgetPayment, vecBudgetPayments) {
+    for (CTxBudgetPayment& budgetPayment : vecBudgetPayments) {
         CBudgetProposal* pbudgetProposal = budget.FindProposal(budgetPayment.nProposalHash);
 
         std::string token = budgetPayment.nProposalHash.ToString();
@@ -2138,7 +2140,7 @@ TrxValidationStatus CFinalizedBudget::IsTransactionValid(const CTransaction& txN
     }
 
     bool paid = false;
-    BOOST_FOREACH (CTxOut out, txNew.vout) {
+    for (CTxOut out : txNew.vout) {
         LogPrint("mnbudget","CFinalizedBudget::IsTransactionValid - nCurrentBudgetPayment=%d, payee=%s == out.scriptPubKey=%s, amount=%ld == out.nValue=%ld\n", 
                  nCurrentBudgetPayment, vecBudgetPayments[nCurrentBudgetPayment].payee.ToString().c_str(), out.scriptPubKey.ToString().c_str(),
                  vecBudgetPayments[nCurrentBudgetPayment].nAmount, out.nValue);
@@ -2215,7 +2217,7 @@ CFinalizedBudgetBroadcast::CFinalizedBudgetBroadcast(const CFinalizedBudget& oth
 {
     strBudgetName = other.strBudgetName;
     nBlockStart = other.nBlockStart;
-    BOOST_FOREACH (CTxBudgetPayment out, other.vecBudgetPayments)
+    for (CTxBudgetPayment out : other.vecBudgetPayments)
         vecBudgetPayments.push_back(out);
     mapVotes = other.mapVotes;
     nFeeTXHash = other.nFeeTXHash;
@@ -2225,7 +2227,7 @@ CFinalizedBudgetBroadcast::CFinalizedBudgetBroadcast(std::string strBudgetNameIn
 {
     strBudgetName = strBudgetNameIn;
     nBlockStart = nBlockStartIn;
-    BOOST_FOREACH (CTxBudgetPayment out, vecBudgetPaymentsIn)
+    for (CTxBudgetPayment out : vecBudgetPaymentsIn)
         vecBudgetPayments.push_back(out);
     mapVotes.clear();
     nFeeTXHash = nFeeTXHashIn;

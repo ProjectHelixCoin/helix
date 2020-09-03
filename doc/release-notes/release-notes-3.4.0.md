@@ -20,7 +20,7 @@ Masternodes will need to be restarted once both the masternode daemon and the co
 How to Upgrade
 ==============
 
-If you are running an older version, shut it down. Wait until it has completely shut down (which might take a few minutes for older versions), then run the installer (on Windows) or just copy over /Applications/HELIX-Qt (on Mac) or helixd/helix-qt (on Linux).
+If you are running an older version, shut it down. Wait until it has completely shut down (which might take a few minutes for older versions), then run the installer (on Windows) or just copy over /Applications/Helix-Qt (on Mac) or helixd/helix-qt (on Linux).
 
 
 Compatibility

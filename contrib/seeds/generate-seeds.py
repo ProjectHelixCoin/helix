@@ -34,8 +34,7 @@ These should be pasted into `src/chainparamsseeds.h`.
 
 from base64 import b32decode
 from binascii import a2b_hex
-import sys
-import os
+import sys, os
 import re
 
 # ipv4 in ipv6 prefix
@@ -47,7 +46,7 @@ def name_to_ipv6(addr):
     if len(addr)>6 and addr.endswith('.onion'):
         vchAddr = b32decode(addr[0:-6], True)
         if len(vchAddr) != 16-len(pchOnionCat):
-            raise ValueError('Invalid onion %s' % vchAddr)
+            raise ValueError('Invalid onion %s' % s)
         return pchOnionCat + vchAddr
     elif '.' in addr: # IPv4
         return pchIPv4 + bytearray((int(x) for x in addr.split('.')))
@@ -74,7 +73,7 @@ def name_to_ipv6(addr):
         raise ValueError('Could not parse address %s' % addr)
 
 def parse_spec(s, defaultport):
-    match = re.match(r'\[([0-9a-fA-F:]+)\](?::([0-9]+))?$', s)
+    match = re.match('\[([0-9a-fA-F:]+)\](?::([0-9]+))?$', s)
     if match: # ipv6
         host = match.group(1)
         port = match.group(2)
@@ -115,7 +114,7 @@ def process_nodes(g, f, structname, defaultport):
 def main():
     if len(sys.argv)<2:
         print(('Usage: %s <path_to_nodes_txt>' % sys.argv[0]), file=sys.stderr)
-        sys.exit(1)
+        exit(1)
     g = sys.stdout
     indir = sys.argv[1]
     g.write('#ifndef BITCOIN_CHAINPARAMSSEEDS_H\n')
@@ -127,10 +126,10 @@ def main():
     g.write(' * Each line contains a 16-byte IPv6 address and a port.\n')
     g.write(' * IPv4 as well as onion addresses are wrapped inside an IPv6 address accordingly.\n')
     g.write(' */\n')
-    with open(os.path.join(indir,'nodes_main.txt'), 'r', encoding="utf8") as f:
+    with open(os.path.join(indir,'nodes_main.txt'),'r') as f:
         process_nodes(g, f, 'pnSeed6_main', 37415)
     g.write('\n')
-    with open(os.path.join(indir,'nodes_test.txt'), 'r', encoding="utf8") as f:
+    with open(os.path.join(indir,'nodes_test.txt'),'r') as f:
         process_nodes(g, f, 'pnSeed6_test', 51474)
     g.write('#endif // BITCOIN_CHAINPARAMSSEEDS_H\n')
 

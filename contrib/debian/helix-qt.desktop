@@ -1,5 +1,5 @@
 [Desktop Entry]
-Version=1.0
+Encoding=UTF-8
 Name=HELIX Core
 Comment=HELIX P2P Cryptocurrency
 Comment[fr]=HELIX, monnaie virtuelle cryptographique pair à pair
@@ -10,4 +10,3 @@ Type=Application
 Icon=helix128
 MimeType=x-scheme-handler/helix;
 Categories=Office;Finance;
-StartupWMClass=Helix-qt

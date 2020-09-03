@@ -38,7 +38,13 @@ QT_FORMS_UI = \
   qt/forms/addressbookpage.ui \
   qt/forms/configuremasternodepage.ui \
   qt/forms/askpassphrasedialog.ui \
-  qt/forms/bip38tooldialog.ui \
+  qt/forms/startoptionsdialog.ui \
+  qt/forms/startoptions.ui \
+  qt/forms/startoptionsrestore.ui \
+  qt/forms/startoptionssort.ui \
+  qt/forms/startoptionsrevealed.ui \
+  qt/forms/startoptionsmain.ui \
+   qt/forms/bip38tooldialog.ui \
   qt/forms/coincontroldialog.ui \
   qt/forms/blockexplorer.ui \
   qt/forms/obfuscationconfig.ui \
@@ -53,6 +59,7 @@ QT_FORMS_UI = \
   qt/forms/overviewpage.ui \
   qt/forms/receivecoinsdialog.ui \
   qt/forms/privacydialog.ui \
+  qt/forms/proposaldialog.ui \
   qt/forms/receiverequestdialog.ui \
   qt/forms/rpcconsole.ui \
   qt/forms/sendcoinsdialog.ui \
@@ -66,6 +73,12 @@ QT_MOC_CPP = \
   qt/moc_configuremasternodepage.cpp \
   qt/moc_addresstablemodel.cpp \
   qt/moc_askpassphrasedialog.cpp \
+  qt/moc_startoptionsdialog.cpp \
+  qt/moc_startoptions.cpp \
+  qt/moc_startoptionsrestore.cpp \
+  qt/moc_startoptionssort.cpp \
+  qt/moc_startoptionsrevealed.cpp \
+  qt/moc_startoptionsmain.cpp \
   qt/moc_bantablemodel.cpp \
   qt/moc_bip38tooldialog.cpp \
   qt/moc_bitcoinaddressvalidator.cpp \
@@ -94,6 +107,7 @@ QT_MOC_CPP = \
   qt/moc_peertablemodel.cpp \
   qt/moc_paymentserver.cpp \
   qt/moc_columnalignedlayout.cpp \
+  qt/moc_proposaldialog.cpp \
   qt/moc_proposalfilterproxy.cpp \
   qt/moc_proposaltablemodel.cpp \
   qt/moc_proposallist.cpp \
@@ -144,6 +158,12 @@ BITCOIN_QT_H = \
   qt/addressbookpage.h \
   qt/addresstablemodel.h \
   qt/askpassphrasedialog.h \
+  qt/startoptionsdialog.h \
+  qt/startoptions.h \
+  qt/startoptionsrestore.h \
+  qt/startoptionssort.h \
+  qt/startoptionsrevealed.h \
+  qt/startoptionsmain.h \
   qt/bantablemodel.h \
   qt/bip38tooldialog.h \
   qt/bitcoinaddressvalidator.h \
@@ -174,6 +194,7 @@ BITCOIN_QT_H = \
   qt/paymentrequestplus.h \
   qt/paymentserver.h \
   qt/columnalignedlayout.h \
+  qt/proposaldialog.h \
   qt/proposalfilterproxy.h \
   qt/proposallist.h \
   qt/proposalrecord.h \
@@ -240,6 +261,8 @@ RES_ICONS = \
   qt/res/icons/filesave.png \
   qt/res/icons/history.png \
   qt/res/icons/history_off.png \
+  qt/res/icons/hd_enabled.png \
+  qt/res/icons/hd_disabled.png \
   qt/res/icons/key.png \
   qt/res/icons/lock_closed.png \
   qt/res/icons/lock_open.png \
@@ -296,11 +319,18 @@ BITCOIN_QT_CPP = \
   qt/optionsmodel.cpp \
   qt/peertablemodel.cpp \
   qt/platformstyle.cpp \
+  qt/proposaldialog.cpp \
   qt/qvalidatedlineedit.cpp \
   qt/qvaluecombobox.cpp \
   qt/rpcconsole.cpp \
   qt/splashscreen.cpp \
   qt/trafficgraphwidget.cpp \
+  qt/startoptionsdialog.cpp \
+  qt/startoptions.cpp \
+  qt/startoptionsrestore.cpp \
+  qt/startoptionssort.cpp \
+  qt/startoptionsrevealed.cpp \
+  qt/startoptionsmain.cpp \
   qt/utilitydialog.cpp
 
 if TARGET_WINDOWS
@@ -327,6 +357,7 @@ BITCOIN_QT_CPP += \
   qt/paymentrequestplus.cpp \
   qt/paymentserver.cpp \
   qt/columnalignedlayout.cpp \
+  qt/proposaldialog.cpp \
   qt/proposalfilterproxy.cpp \
   qt/proposallist.cpp \
   qt/proposalrecord.cpp \

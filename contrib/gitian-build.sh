@@ -6,7 +6,6 @@
 sign=false
 verify=false
 build=false
-setupenv=false
 
 # Systems to build
 linux=true
@@ -14,14 +13,13 @@ windows=true
 osx=true
 
 # Other Basic variables
-SIGNER=nathansenn
-VERSION=1.2.2
+SIGNER=
+VERSION=
 commit=false
 url=https://github.com/ProjectHelixCoin/helix
-proc=8
-mem=12000
+proc=2
+mem=2000
 lxc=true
-docker=false
 osslTarUrl=http://downloads.sourceforge.net/project/osslsigncode/osslsigncode/osslsigncode-1.7.1.tar.gz
 osslPatchUrl=https://bitcoincore.org/cfields/osslsigncode-Backports-to-1.7.1.patch
 scriptName=$(basename -- "$0")
@@ -29,7 +27,7 @@ signProg="gpg --detach-sign"
 commitFiles=true
 
 # Help Message
-read -d '' usage <<- EOF
+read -r -d '' usage <<- EOF
 Usage: $scriptName [-c|u|v|b|s|B|o|h|j|m|] signer version
 
 Run this script from the directory containing the helix, gitian-builder, gitian.sigs, and helix-detached-sigs.
@@ -45,13 +43,11 @@ Options:
 -b|--build	Do a gitian build
 -s|--sign	Make signed binaries for Windows and Mac OSX
 -B|--buildsign	Build both signed and unsigned binaries
--o|--os		Specify which Operating Systems the build is for. Default is lwx. l for linux, w for windows, x for osx
+-o|--os		Specify which Operating Systems the build is for. Default is lwx. l for linux, w for windows, x for osx, a for aarch64
 -j		Number of processes to use. Default 2
 -m		Memory to allocate in MiB. Default 2000
---kvm           Use KVM
---lxc           Use LXC
---docker        Use Docker
---setup         Setup the gitian building environment. Uses KVM. If you want to use lxc, use the --lxc option. If you want to use Docker, use --docker. Only works on Debian-based systems (Ubuntu, Debian)
+--kvm           Use KVM instead of LXC
+--setup         Setup the gitian building environment. Uses KVM. If you want to use lxc, use the --lxc option. Only works on Debian-based systems (Ubuntu, Debian)
 --detach-sign   Create the assert file for detached signing. Will not commit anything.
 --no-commit     Do not commit anything to git
 -h|--help	Print this help message
@@ -81,7 +77,7 @@ while :; do
         -S|--signer)
 	    if [ -n "$2" ]
 	    then
-		SIGNER="$2"
+		SIGNER=$2
 		shift
 	    else
 		echo 'Error: "--signer" requires a non-empty argument.'
@@ -95,6 +91,7 @@ while :; do
 		linux=false
 		windows=false
 		osx=false
+		aarch64=false
 		if [[ "$2" = *"l"* ]]
 		then
 		    linux=true
@@ -109,7 +106,7 @@ while :; do
 		fi
 		shift
 	    else
-		echo 'Error: "--os" requires an argument containing an l (for linux), w (for windows), or x (for Mac OSX)\n'
+		printf 'Error: "--os" requires an argument containing an l (for linux), w (for windows), x (for Mac OSX), or a (for aarch64)\n'
 		exit 1
 	    fi
 	    ;;
@@ -156,19 +153,8 @@ while :; do
 	    fi
 	    ;;
         # kvm
-        --lxc)
-            lxc=true
-            docker=false
-            ;;
-        # kvm
         --kvm)
             lxc=false
-            docker=false
-            ;;
-        # docker
-        --docker)
-            lxc=false
-            docker=true
             ;;
         # Detach sign
         --detach-sign)
@@ -194,10 +180,7 @@ if [[ $lxc = true ]]
 then
     export USE_LXC=1
     export LXC_BRIDGE=lxcbr0
-    sudo ifconfig lxcbr0 up 10.0.3.2
-elif [[ $docker = true ]]
-then
-    export USE_DOCKER=1
+    sudo ifconfig lxcbr0 up 10.0.2.2
 fi
 
 # Check for OSX SDK
@@ -210,7 +193,7 @@ fi
 # Get signer
 if [[ -n "$1" ]]
 then
-    SIGNER="$1"
+    SIGNER=$1
     shift
 fi
 
@@ -223,7 +206,7 @@ then
 fi
 
 # Check that a signer is specified
-if [[ "$SIGNER" == "" ]]
+if [[ $SIGNER == "" ]]
 then
     echo "$scriptName: Missing signer."
     echo "Try $scriptName --help for more information"
@@ -243,7 +226,7 @@ if [[ $commit = false ]]
 then
 	COMMIT="v${VERSION}"
 fi
-echo ${COMMIT}
+echo "${COMMIT}"
 
 # Setup build environment
 if [[ $setup = true ]]
@@ -257,21 +240,17 @@ then
     then
         sudo apt-get install lxc
         bin/make-base-vm --suite trusty --arch amd64 --lxc
-    elif [[ -n "$USE_DOCKER" ]]
-    then
-        sudo apt-get install docker-ce
-        bin/make-base-vm --suite trusty --arch amd64 --docker
     else
         bin/make-base-vm --suite trusty --arch amd64
     fi
-    popd
+    popd || exit
 fi
 
 # Set up build
 pushd ./helix
 git fetch
-git checkout ${COMMIT}
-popd
+git checkout "${COMMIT}"
+popd || exit
 
 # Build
 if [[ $build = true ]]
@@ -283,11 +262,11 @@ then
 	echo ""
 	echo "Building Dependencies"
 	echo ""
-	pushd ./gitian-builder	
+	pushd ./gitian-builder || exit
 	mkdir -p inputs
 	wget -N -P inputs $osslPatchUrl
 	wget -N -P inputs $osslTarUrl
-	make -C ../helix/depends download SOURCES_PATH=`pwd`/cache/common
+	make -C ../helix/depends download SOURCES_PATH="$(pwd)/cache/common"
 
 	# Linux
 	if [[ $linux = true ]]
@@ -321,7 +300,17 @@ then
 	    mv build/out/helix-*-osx-unsigned.tar.gz inputs/helix-osx-unsigned.tar.gz
 	    mv build/out/helix-*.tar.gz build/out/helix-*.dmg ../helix-binaries/${VERSION}
 	fi
-	popd
+		# AArch64
+	if [[ $aarch64 = true ]]
+	then
+	    echo ""
+	    echo "Compiling ${VERSION} AArch64"
+	    echo ""
+	    ./bin/gbuild -j ${proc} -m ${mem} --commit helix=${COMMIT} --url helix=${url} ../helix/contrib/gitian-descriptors/gitian-aarch64.yml
+	    ./bin/gsign --signer $SIGNER --release ${VERSION}-aarch64 --destination ../gitian.sigs/ ../helix/contrib/gitian-descriptors/gitian-aarch64.yml
+	    mv build/out/helix-*.tar.gz build/out/src/helix-*.tar.gz ../helix-binaries/${VERSION}
+	fi
+	popd || exit
 
         if [[ $commitFiles = true ]]
         then
@@ -329,12 +318,13 @@ then
             echo ""
             echo "Committing ${VERSION} Unsigned Sigs"
             echo ""
-            pushd gitian.sigs
-            git add ${VERSION}-linux/"${SIGNER}"
-            git add ${VERSION}-win-unsigned/"${SIGNER}"
-            git add ${VERSION}-osx-unsigned/"${SIGNER}"
+            pushd gitian.sigs || exit
+            git add ${VERSION}-linux/${SIGNER}
+            git add ${VERSION}-aarch64/${SIGNER}
+            git add ${VERSION}-win-unsigned/${SIGNER}
+            git add ${VERSION}-osx-unsigned/${SIGNER}
             git commit -a -m "Add ${VERSION} unsigned sigs for ${SIGNER}"
-            popd
+            popd || exit
         fi
 fi
 
@@ -342,7 +332,7 @@ fi
 if [[ $verify = true ]]
 then
 	# Linux
-	pushd ./gitian-builder
+	pushd ./gitian-builder || exit
 	echo ""
 	echo "Verifying v${VERSION} Linux"
 	echo ""
@@ -357,6 +347,11 @@ then
 	echo "Verifying v${VERSION} Mac OSX"
 	echo ""	
 	./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-osx-unsigned ../helix/contrib/gitian-descriptors/gitian-osx.yml
+	# AArch64
+	echo ""
+	echo "Verifying v${VERSION} AArch64"
+	echo ""
+	./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-aarch64 ../helix/contrib/gitian-descriptors/gitian-aarch64.yml
 	# Signed Windows
 	echo ""
 	echo "Verifying v${VERSION} Signed Windows"
@@ -367,14 +362,14 @@ then
 	echo "Verifying v${VERSION} Signed Mac OSX"
 	echo ""
 	./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-osx-signed ../helix/contrib/gitian-descriptors/gitian-osx-signer.yml
-	popd
+	popd || exit
 fi
 
 # Sign binaries
 if [[ $sign = true ]]
 then
 	
-        pushd ./gitian-builder
+        pushd ./gitian-builder || exit
 	# Sign Windows
 	if [[ $windows = true ]]
 	then
@@ -382,7 +377,7 @@ then
 	    echo "Signing ${VERSION} Windows"
 	    echo ""
 	    ./bin/gbuild -i --commit signature=${COMMIT} ../helix/contrib/gitian-descriptors/gitian-win-signer.yml
-	    ./bin/gsign -p "$signProg" --signer "$SIGNER" --release ${VERSION}-win-signed --destination ../gitian.sigs/ ../helix/contrib/gitian-descriptors/gitian-win-signer.yml
+	    ./bin/gsign --signer $SIGNER --release ${VERSION}-win-signed --destination ../gitian.sigs/ ../helix/contrib/gitian-descriptors/gitian-win-signer.yml
 	    mv build/out/helix-*win64-setup.exe ../helix-binaries/${VERSION}
 	    mv build/out/helix-*win32-setup.exe ../helix-binaries/${VERSION}
 	fi
@@ -393,22 +388,22 @@ then
 	    echo "Signing ${VERSION} Mac OSX"
 	    echo ""
 	    ./bin/gbuild -i --commit signature=${COMMIT} ../helix/contrib/gitian-descriptors/gitian-osx-signer.yml
-	    ./bin/gsign -p "$signProg" --signer "$SIGNER" --release ${VERSION}-osx-signed --destination ../gitian.sigs/ ../helix/contrib/gitian-descriptors/gitian-osx-signer.yml
+	    ./bin/gsign --signer $SIGNER --release ${VERSION}-osx-signed --destination ../gitian.sigs/ ../helix/contrib/gitian-descriptors/gitian-osx-signer.yml
 	    mv build/out/helix-osx-signed.dmg ../helix-binaries/${VERSION}/helix-${VERSION}-osx.dmg
 	fi
-	popd
+	popd || exit
 
         if [[ $commitFiles = true ]]
         then
             # Commit Sigs
-            pushd gitian.sigs
+            pushd gitian.sigs || exit
             echo ""
             echo "Committing ${VERSION} Signed Sigs"
             echo ""
-            git add ${VERSION}-win-signed/"${SIGNER}"
-            git add ${VERSION}-osx-signed/"${SIGNER}"
+            git add ${VERSION}-win-signed/${SIGNER}
+            git add ${VERSION}-osx-signed/${SIGNER}
             git commit -a -m "Add ${VERSION} signed binary sigs for ${SIGNER}"
-            popd
+            popd || exit
         fi
 fi
 

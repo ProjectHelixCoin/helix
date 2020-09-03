@@ -16,8 +16,6 @@
 
 #include <vector>
 
-#include <boost/foreach.hpp>
-
 struct CDiskBlockPos {
     int nFile;
     unsigned int nPos;
@@ -433,7 +431,7 @@ public:
         hashNext = uint256();
     }
 
-    explicit CDiskBlockIndex(CBlockIndex* pindex) : CBlockIndex(*pindex)
+    explicit CDiskBlockIndex(const CBlockIndex* pindex) : CBlockIndex(*pindex)
     {
         hashPrev = (pprev ? pprev->GetBlockHash() : uint256());
     }

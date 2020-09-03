@@ -1,2 +1,2 @@
-doc/man/helixd.1
-doc/man/helix-cli.1
+debian/man/helixd.1
+debian/man/helix.conf.5
