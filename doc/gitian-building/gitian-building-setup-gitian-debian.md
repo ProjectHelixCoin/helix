@@ -60,7 +60,7 @@ echo "76cbf8c52c391160b2641e7120dbade5afded713afaa6032f733a261f13e6a8e  vm-build
 # (verification -- must return OK)
 tar -zxvf vm-builder_0.12.4+bzr494.orig.tar.gz
 cd vm-builder-0.12.4+bzr494
-sudo python setup.py install
+sudo python3 setup.py install
 cd ..
 ```
 
