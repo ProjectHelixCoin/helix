@@ -1,9 +1,9 @@
 [Desktop Entry]
 Encoding=UTF-8
-Name=HELIX Core
-Comment=HELIX P2P Cryptocurrency
-Comment[fr]=HELIX, monnaie virtuelle cryptographique pair à pair
-Comment[tr]=HELIX, eşten eşe kriptografik sanal para birimi
+Name=Helix
+Comment=Helix P2P Cryptocurrency
+Comment[fr]=Helix, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=Helix, eşten eşe kriptografik sanal para birimi
 Exec=helix-qt %u
 Terminal=false
 Type=Application

@@ -1,7 +1,7 @@
-// Copyright (c) 2011-2015 The Bitcoin Core developers
-// Copyright (c) 2018 The Phore developers
-// Copyright (c) 2018-2019 The Helix developers
-// Distributed under the MIT software license, see the accompanying
+// Copyright (c) 2018 The Helix developers
+// Copyright (c) 2018 The Curium developers
+// Copyright (c) 2017-2018 The Bulwark Developers
+// Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef BITCOIN_QT_PROPOSALTABLEMODEL_H
@@ -82,7 +82,7 @@ private:
     QStringList columns;
 
     int proposalType = 0;
-    
+
 public Q_SLOTS:
     void onResult(QNetworkReply *result);
 };

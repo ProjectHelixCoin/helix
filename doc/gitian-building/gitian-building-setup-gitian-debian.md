@@ -28,10 +28,10 @@ echo "%sudo ALL=NOPASSWD: /usr/bin/lxc-start" > /etc/sudoers.d/gitian-lxc
 echo "%sudo ALL=NOPASSWD: /usr/bin/lxc-execute" >> /etc/sudoers.d/gitian-lxc
 # make /etc/rc.local script that sets up bridge between guest and host
 echo '#!/bin/sh -e' > /etc/rc.local
-echo 'brctl addbr lxcbr0' >> /etc/rc.local
-echo 'ifconfig lxcbr0 10.0.3.2/24 up' >> /etc/rc.local
-echo 'iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE' >> /etc/rc.local
-echo 'echo 1 > /proc/sys/net/ipv4/ip_forward' >> /etc/rc.local
+echo 'brctl addbr br0' >> /etc/rc.local
+echo 'ip addr add 10.0.3.2/24 broadcast 10.0.3.255 dev br0' >> /etc/rc.local
+echo 'ip link set br0 up' >> /etc/rc.local
+echo 'firewall-cmd --zone=trusted --add-interface=br0' >> /etc/rc.local
 echo 'exit 0' >> /etc/rc.local
 # make sure that USE_LXC is always set when logging in as gitianuser,
 # and configure LXC IP addresses
@@ -60,7 +60,7 @@ echo "76cbf8c52c391160b2641e7120dbade5afded713afaa6032f733a261f13e6a8e  vm-build
 # (verification -- must return OK)
 tar -zxvf vm-builder_0.12.4+bzr494.orig.tar.gz
 cd vm-builder-0.12.4+bzr494
-sudo python3 setup.py install
+sudo python setup.py install
 cd ..
 ```
 

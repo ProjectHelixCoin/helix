@@ -1,3 +1,4 @@
+#!/bin/bash
 # Copyright (c) 2016 The Bitcoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -103,6 +104,10 @@ while :; do
 		if [[ "$2" = *"x"* ]]
 		then
 		    osx=true
+		fi
+		if [[ "$2" = *"a"* ]]
+		then
+		    aarch64=true
 		fi
 		shift
 	    else
@@ -235,7 +240,7 @@ then
 	git clone https://github.com/ProjectHelixCoin/gitian.sigs
 	git clone https://github.com/ProjectHelixCoin/helix-detached-sigs
 	git clone https://github.com/devrandom/gitian-builder.git
-    pushd ./gitian-builder
+    pushd ./gitian-builder || exit
     if [[ -n "$USE_LXC" ]]
     then
         sudo apt-get install lxc
@@ -247,7 +252,7 @@ then
 fi
 
 # Set up build
-pushd ./helix
+pushd ./helix || exit
 git fetch
 git checkout "${COMMIT}"
 popd || exit
@@ -256,8 +261,8 @@ popd || exit
 if [[ $build = true ]]
 then
 	# Make output folder
-	mkdir -p ./helix-binaries/${VERSION}
-	
+	mkdir -p "./helix-binaries/${VERSION}"
+
 	# Build Dependencies
 	echo ""
 	echo "Building Dependencies"
@@ -275,7 +280,7 @@ then
 	    echo "Compiling ${VERSION} Linux"
 	    echo ""
 	    ./bin/gbuild -j ${proc} -m ${mem} --commit helix=${COMMIT} --url helix=${url} ../helix/contrib/gitian-descriptors/gitian-linux.yml
-	    ./bin/gsign -p "$signProg" --signer "$SIGNER" --release ${VERSION}-linux --destination ../gitian.sigs/ ../helix/contrib/gitian-descriptors/gitian-linux.yml
+	    ./bin/gsign --signer $SIGNER --release ${VERSION}-linux --destination ../gitian.sigs/ ../helix/contrib/gitian-descriptors/gitian-linux.yml
 	    mv build/out/helix-*.tar.gz build/out/src/helix-*.tar.gz ../helix-binaries/${VERSION}
 	fi
 	# Windows
@@ -285,7 +290,7 @@ then
 	    echo "Compiling ${VERSION} Windows"
 	    echo ""
 	    ./bin/gbuild -j ${proc} -m ${mem} --commit helix=${COMMIT} --url helix=${url} ../helix/contrib/gitian-descriptors/gitian-win.yml
-	    ./bin/gsign -p "$signProg" --signer "$SIGNER" --release ${VERSION}-win-unsigned --destination ../gitian.sigs/ ../helix/contrib/gitian-descriptors/gitian-win.yml
+	    ./bin/gsign --signer $SIGNER --release ${VERSION}-win-unsigned --destination ../gitian.sigs/ ../helix/contrib/gitian-descriptors/gitian-win.yml
 	    mv build/out/helix-*-win-unsigned.tar.gz inputs/helix-win-unsigned.tar.gz
 	    mv build/out/helix-*.zip build/out/helix-*.exe ../helix-binaries/${VERSION}
 	fi
@@ -296,11 +301,11 @@ then
 	    echo "Compiling ${VERSION} Mac OSX"
 	    echo ""
 	    ./bin/gbuild -j ${proc} -m ${mem} --commit helix=${COMMIT} --url helix=${url} ../helix/contrib/gitian-descriptors/gitian-osx.yml
-	    ./bin/gsign -p "$signProg" --signer "$SIGNER" --release ${VERSION}-osx-unsigned --destination ../gitian.sigs/ ../helix/contrib/gitian-descriptors/gitian-osx.yml
+	    ./bin/gsign --signer $SIGNER --release ${VERSION}-osx-unsigned --destination ../gitian.sigs/ ../helix/contrib/gitian-descriptors/gitian-osx.yml
 	    mv build/out/helix-*-osx-unsigned.tar.gz inputs/helix-osx-unsigned.tar.gz
 	    mv build/out/helix-*.tar.gz build/out/helix-*.dmg ../helix-binaries/${VERSION}
 	fi
-		# AArch64
+	# AArch64
 	if [[ $aarch64 = true ]]
 	then
 	    echo ""
@@ -342,10 +347,10 @@ then
 	echo "Verifying v${VERSION} Windows"
 	echo ""
 	./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-win-unsigned ../helix/contrib/gitian-descriptors/gitian-win.yml
-	# Mac OSX	
+	# Mac OSX
 	echo ""
 	echo "Verifying v${VERSION} Mac OSX"
-	echo ""	
+	echo ""
 	./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-osx-unsigned ../helix/contrib/gitian-descriptors/gitian-osx.yml
 	# AArch64
 	echo ""
@@ -368,7 +373,7 @@ fi
 # Sign binaries
 if [[ $sign = true ]]
 then
-	
+
         pushd ./gitian-builder || exit
 	# Sign Windows
 	if [[ $windows = true ]]
@@ -406,5 +411,3 @@ then
             popd || exit
         fi
 fi
-
-

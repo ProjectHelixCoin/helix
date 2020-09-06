@@ -1,210 +1,218 @@
-macOS Build Instructions and Notes
+Mac OS X Build Instructions and Notes
 ====================================
-The commands in this guide should be executed in a Terminal application.
-The built-in one is located in `/Applications/Utilities/Terminal.app`.
-
-Preparation
------------
-Install the macOS command line tools:
-
-`xcode-select --install`
-
-When the popup appears, click `Install`.
-
-Then install [Homebrew](https://brew.sh).
-
-Dependencies
-----------------------
-
-    brew install autoconf automake berkeley-db4 libtool boost miniupnpc openssl pkg-config protobuf python3 qt5 zmq libevent qrencode gmp
-
-See [dependencies.md](dependencies.md) for a complete overview.
-
-If you want to build the disk image with `make deploy` (.dmg / optional), you need RSVG:
-
-    brew install librsvg
-
-Berkeley DB
------------
-It is recommended to use Berkeley DB 4.8. If you have to build it yourself,
-you can use [the installation script included in contrib/](/contrib/install_db4.sh)
-like so:
-
-```shell
-./contrib/install_db4.sh .
-```
-
-from the root of the repository.
-
-**Note**: You only need Berkeley DB if the wallet is enabled (see [*Disable-wallet mode*](/doc/build-osx.md#disable-wallet-mode)).
-
-Build HELIX Core
-------------------------
-
-1. Clone the HELIX Core source code:
-
-        git clone https://github.com/projecthelixcoin/helix
-        cd helix
-
-2.  Make the Homebrew OpenSSL headers visible to the configure script  (do ```brew info openssl``` to find out why this is necessary, or if you use Homebrew with installation folders different from the default).
-
-        export LDFLAGS+=-L/usr/local/opt/openssl/lib
-        export CPPFLAGS+=-I/usr/local/opt/openssl/include
-
-3.  Build HELIX Core:
-
-        ./autogen.sh
-        ./configure
-        make
-
-4.  It is recommended to build and run the unit tests:
-
-        make check
-
-5.  You can also create a .dmg that contains the .app bundle (optional):
-
-        make deploy
-
-Disable-wallet mode
---------------------
-**Note:** This functionality is not yet completely implemented, and compilation using the below option will currently fail.
-
-When the intention is to run only a P2P node without a wallet, HELIX Core may be compiled in
-disable-wallet mode with:
-
-    ./configure --disable-wallet
-
-In this case there is no dependency on Berkeley DB 4.8.
-
-Running
--------
-
-HELIX Core is now available at `./src/helixd`
-
-Before running, you may create an empty configuration file:
-
-    mkdir -p "/Users/${USER}/Library/Application Support/HELIX"
-
-    touch "/Users/${USER}/Library/Application Support/HELIX/helix.conf"
-
-    chmod 600 "/Users/${USER}/Library/Application Support/HELIX/helix.conf"
-
-The first time you run helixd, it will start downloading the blockchain. This process could take many hours, or even days on slower than average systems.
-
-You can monitor the download process by looking at the debug.log file:
-
-    tail -f $HOME/Library/Application\ Support/HELIX/debug.log
-
-Other commands:
--------
-
-    ./src/helixd -daemon # Starts the helix daemon.
-    ./src/helix-cli --help # Outputs a list of command-line options.
-    ./src/helix-cli help # Outputs a list of RPC commands when the daemon is running.
+This guide will show you how to build helixd (headless client) for OSX.
 
 Notes
 -----
 
-* Tested on OS X 10.10 Yosemite through macOS 10.13 High Sierra on 64-bit Intel processors only.
+* Tested on OS X 10.7 through 10.10 on 64-bit Intel processors only. Please read carefully if you are building on High Sierra (10.13), there are special instructions.
 
-* Building with downloaded Qt binaries is not officially supported. See the notes in [#7714](https://github.com/bitcoin/bitcoin/issues/7714)
+* All of the commands should be executed in a Terminal application. The
+built-in one is located in `/Applications/Utilities`.
 
-Deterministic macOS DMG Notes
------------------------------
+Preparation
+-----------
 
-Working macOS DMGs are created in Linux by combining a recent clang,
-the Apple binutils (ld, ar, etc) and DMG authoring tools.
+You need to install XCode with all the options checked so that the compiler
+and everything is available in /usr not just /Developer. XCode should be
+available on your OS X installation media, but if not, you can get the
+current version from https://developer.apple.com/xcode/. If you install
+Xcode 4.3 or later, you'll need to install its command line tools. This can
+be done in `Xcode > Preferences > Downloads > Components` and generally must
+be re-done or updated every time Xcode is updated.
 
-Apple uses clang extensively for development and has upstreamed the necessary
-functionality so that a vanilla clang can take advantage. It supports the use
-of -F, -target, -mmacosx-version-min, and --sysroot, which are all necessary
-when building for macOS.
+There's also an assumption that you already have `git` installed. If
+not, it's the path of least resistance to install [Github for Mac](https://mac.github.com/)
+(OS X 10.7+) or
+[Git for OS X](https://code.google.com/p/git-osx-installer/). It is also
+available via Homebrew.
 
-Apple's version of binutils (called cctools) contains lots of functionality
-missing in the FSF's binutils. In addition to extra linker options for
-frameworks and sysroots, several other tools are needed as well such as
-install_name_tool, lipo, and nmedit. These do not build under linux, so they
-have been patched to do so. The work here was used as a starting point:
-[mingwandroid/toolchain4](https://github.com/mingwandroid/toolchain4).
+You will also need to install [Homebrew](http://brew.sh) in order to install library
+dependencies.
 
-In order to build a working toolchain, the following source packages are needed
-from Apple: cctools, dyld, and ld64.
+The installation of the actual dependencies is covered in the Instructions
+sections below.
 
-These tools inject timestamps by default, which produce non-deterministic
-binaries. The ZERO_AR_DATE environment variable is used to disable that.
+Instructions: Homebrew
+----------------------
 
-This version of cctools has been patched to use the current version of clang's
-headers and its libLTO.so rather than those from llvmgcc, as it was
-originally done in toolchain4.
+#### Install dependencies using Homebrew
 
-To complicate things further, all builds must target an Apple SDK. These SDKs
-are free to download, but not redistributable.
-To obtain it, register for a developer account, then download the [Xcode 7.3.1 dmg](https://developer.apple.com/devcenter/download.action?path=/Developer_Tools/Xcode_7.3.1/Xcode_7.3.1.dmg).
+        brew install autoconf automake berkeley-db4 libtool boost miniupnpc openssl pkg-config protobuf qt5 zeromq libevent
+        
+        Note: On OSX versions lower than High Sierra, zeromq should be replaced with libzmq
 
-This file is several gigabytes in size, but only a single directory inside is
-needed:
-```
-Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk
-```
+### Building `helixd`
 
-Unfortunately, the usual linux tools (7zip, hpmount, loopback mount) are incapable of opening this file.
-To create a tarball suitable for Gitian input, there are two options:
+1. Clone the github tree to get the source code and go into the directory.
 
-Using macOS, you can mount the dmg, and then create it with:
-```
-  $ hdiutil attach Xcode_7.3.1.dmg
-  $ tar -C /Volumes/Xcode/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/ -czf MacOSX10.11.sdk.tar.gz MacOSX10.11.sdk
-```
+        git clone https://github.com/helixproject/Helix.git
+        cd Helix
 
-Alternatively, you can use 7zip and SleuthKit to extract the files one by one.
-The script contrib/macdeploy/extract-osx-sdk.sh automates this. First ensure
-the dmg file is in the current directory, and then run the script. You may wish
-to delete the intermediate 5.hfs file and MacOSX10.11.sdk (the directory) when
-you've confirmed the extraction succeeded.
+2.  Make the Homebrew OpenSSL headers visible to the configure script  (do ```brew info openssl``` to find out why this is necessary, or if you use Homebrew with installation folders different from the default).
+         export LDFLAGS+=-L/usr/local/opt/openssl/lib
+        export CPPFLAGS+=-I/usr/local/opt/openssl/include
+        
+3.  Build helixd:
+        
+        chmod +x share/genbuild.sh autogen.sh 
+        ./autogen.sh
+        ./configure --with-gui=qt5 
+        make
+(note: if configure fails with libprotobuf not found see [Troubleshooting](#trouble) at the bottom)
 
-```bash
-apt-get install p7zip-full sleuthkit
-contrib/macdeploy/extract-osx-sdk.sh
-rm -rf 5.hfs MacOSX10.11.sdk
-```
 
-The Gitian descriptors build 2 sets of files: Linux tools, then Apple binaries
-which are created using these tools. The build process has been designed to
-avoid including the SDK's files in Gitian's outputs. All interim tarballs are
-fully deterministic and may be freely redistributed.
+4.  It is also a good idea to build and run the unit tests:
 
-genisoimage is used to create the initial DMG. It is not deterministic as-is,
-so it has been patched. A system genisoimage will work fine, but it will not
-be deterministic because the file-order will change between invocations.
-The patch can be seen here:  [theuni/osx-cross-depends](https://raw.githubusercontent.com/theuni/osx-cross-depends/master/patches/cdrtools/genisoimage.diff).
-No effort was made to fix this cleanly, so it likely leaks memory badly. But
-it's only used for a single invocation, so that's no real concern.
+        make check
 
-genisoimage cannot compress DMGs, so afterwards, the 'dmg' tool from the
-libdmg-hfsplus project is used to compress it. There are several bugs in this
-tool and its maintainer has seemingly abandoned the project. It has been forked
-and is available (with fixes) here: [theuni/libdmg-hfsplus](https://github.com/theuni/libdmg-hfsplus).
+5.  (Optional) You can also install helixd to your path:
 
-The 'dmg' tool has the ability to create DMGs from scratch as well, but this
-functionality is broken. Only the compression feature is currently used.
-Ideally, the creation could be fixed and genisoimage would no longer be necessary.
+        make install
 
-Background images and other features can be added to DMG files by inserting a
-.DS_Store before creation. This is generated by the script
-contrib/macdeploy/custom_dsstore.py.
+Use Qt Creator as IDE
+------------------------
+You can use Qt Creator as IDE, for debugging and for manipulating forms, etc.
+Download Qt Creator from http://www.qt.io/download/. Download the "community edition" and only install Qt Creator (uncheck the rest during the installation process).
 
-As of OS X 10.9 Mavericks, using an Apple-blessed key to sign binaries is a
-requirement in order to satisfy the new Gatekeeper requirements. Because this
-private key cannot be shared, we'll have to be a bit creative in order for the
-build process to remain somewhat deterministic. Here's how it works:
+1. Make sure you installed everything through homebrew mentioned above
+2. Do a proper ./configure --with-gui=qt5 --enable-debug
+3. In Qt Creator do "New Project" -> Import Project -> Import Existing Project
+4. Enter "helix-qt" as project name, enter src/qt as location
+5. Leave the file selection as it is
+6. Confirm the "summary page"
+7. In the "Projects" tab select "Manage Kits..."
+8. Select the default "Desktop" kit and select "Clang (x86 64bit in /usr/bin)" as compiler
+9. Select LLDB as debugger (you might need to set the path to your installtion)
+10. Start debugging with Qt Creator
 
-- Builders use Gitian to create an unsigned release. This outputs an unsigned
-  dmg which users may choose to bless and run. It also outputs an unsigned app
-  structure in the form of a tarball, which also contains all of the tools
-  that have been previously (deterministically) built in order to create a
-  final dmg.
-- The Apple keyholder uses this unsigned app to create a detached signature,
-  using the script that is also included there. Detached signatures are available from this [repository](https://github.com/bitcoin-core/bitcoin-detached-sigs).
-- Builders feed the unsigned app + detached signature back into Gitian. It
-  uses the pre-built tools to recombine the pieces into a deterministic dmg.
+Creating a release build
+------------------------
+You can ignore this section if you are building `helixd` for your own use.
 
+helixd/helix-cli binaries are not included in the helix-Qt.app bundle.
+
+If you are building `helixd` or `helix-qt` for others, your build machine should be set up
+as follows for maximum compatibility:
+
+All dependencies should be compiled with these flags:
+
+ -mmacosx-version-min=10.7
+ -arch x86_64
+ -isysroot $(xcode-select --print-path)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk
+
+Once dependencies are compiled, see release-process.md for how the Helix-Qt.app
+bundle is packaged and signed to create the .dmg disk image that is distributed.
+
+Running
+-------
+
+It's now available at `./helixd`, provided that you are still in the `src`
+directory. We have to first create the RPC configuration file, though.
+
+Run `./helixd` to get the filename where it should be put, or just try these
+commands:
+
+    echo -e "rpcuser=helixrpc\nrpcpassword=$(xxd -l 16 -p /dev/urandom)" > "/Users/${USER}/Library/Application Support/Helix/helix.conf"
+    chmod 600 "/Users/${USER}/Library/Application Support/Helix/helix.conf"
+
+The next time you run it, it will start downloading the blockchain, but it won't
+output anything while it's doing this. This process may take several hours;
+you can monitor its process by looking at the debug.log file, like this:
+
+    tail -f $HOME/Library/Application\ Support/Helix/debug.log
+
+Other commands:
+-------
+
+    ./helixd -daemon # to start the helix daemon.
+    ./helix-cli --help  # for a list of command-line options.
+    ./helix-cli help    # When the daemon is running, to get a list of RPC commands
+    
+Troubleshooting:<a name="trouble"></a>
+---------
+* brew install not working? Try replacing zeromq with libzmq in the brew install command
+                
+* libprotobuf not found during ./configure? Make sure you have installed protobuf with `brew install protobuf` and then run `export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig` and try again
+                
+* Database errors have been seen in builds on High Sierra. One solution is to build Berkeley DB from source.
+        
+        cd ~
+        wget 'http://download.oracle.com/berkeley-db/db-4.8.30.NC.tar.gz'
+        tar -xzvf db-4.8.30.NC.tar.gz
+        cd db-4.8.30.NC/build_unix/
+        ../dist/configure --enable-cxx
+        make
+        sudo make install
+
+        Then configure Helix with this build of BerkeleyDB,
+        ./configure --with-gui=qt5  LDFLAGS="-L/usr/local/BerkeleyDB.4.8/lib/" CPPFLAGS="-I/usr/local/BerkeleyDB.4.8/include/"
+                
+        
+* In the case you see: `configure: error: OpenSSL ec header missing`, run the following commands:
+
+        export LDFLAGS=-L/usr/local/opt/openssl/lib
+        export CPPFLAGS=-I/usr/local/opt/openssl/include
+
+### Building Qt wallet for OSX High Sierra
+
+Currently the gitian build is not supported for Mac OSX High Sierra, but a Qt wallet can be built natively on a OSX High Sierra machine. These instructions provide the steps to perform that build from source code.
+
+If you do not have XCode instlled, go to the Mac App Store and install it.
+
+If you already had homebrew installed, you likely have a newer version that we need of boost, which will cause problems. Uninstall boost first. We need version 1.57 to compile the wallet.
+
+Otherwise, open Terminal and type in the command to install homebrew:
+
+```/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"```
+
+The use homebrew to install a number of unix programs and libraries needed to build the Helix wallet:
+
+```brew install autoconf automake berkeley-db@4 boost@1.57 git libevent libtool miniupnpc openssl pkg-config protobuf qt zeromq```
+
+To have the build process use the proper version of boost, link that version as follows:
+
+```brew link boost@1.57 --force```
+
+Next, switch into your Downloads folder:
+
+```cd ~/Downloads```
+
+The next step is to download the current version of the wallet from Github and go into that directory:
+
+```git clone https://github.com/helixproject/helix.git```
+```cd Helix```
+
+Now set some configuration flags:
+
+export LDFLAGS=-L/usr/local/opt/openssl/lib;export CPPFLAGS=-I/usr/local/opt/openssl/include
+
+Then we begin the build process:
+
+```./autogen.sh```
+```./configure```
+```make```
+
+You have the choice to build the GUI Helix wallet as a Mac OSX app, described in “How to build the Helix-Qt App”. If, for whatever reason, you prefer to use the command line tools, continue with “Command line tools”.
+
+### How to build the Helix-Qt App:
+
+After make is finished, you can create an App bundle inside a disk image with:
+
+```make deploy```
+
+Once this is done, you’ll find Helix-Qt.dmg inside your Helix folder. Open and install the wallet like any typical Mac app.
+
+### Command line tools
+
+Once the build is complete, switch into the src/qt subdirectory:
+
+```cd src/qt```
+
+And there you have your wallet – you can start it by running:
+
+```./helix-qt```
+
+You can move the wallet app to another more permanent location. If you have not moved it and want to start your wallet in the future, open Terminal and run this command:
+
+~/Downloads/Helix/src/qt/helix-qt

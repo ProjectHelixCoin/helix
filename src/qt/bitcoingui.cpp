@@ -43,7 +43,7 @@
 #include <QDesktopWidget>
 #include <QDragEnterEvent>
 #include <QIcon>
-//#include <QFontDatabase>
+#include <QFontDatabase>
 #include <QListWidget>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -115,11 +115,11 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
                                                                             prevBlocks(0),
                                                                             spinnerFrame(0)
 {
-    /*QFontDatabase::addApplicationFont(":/fonts/Hind-Bold");
+    QFontDatabase::addApplicationFont(":/fonts/Hind-Bold");
     QFontDatabase::addApplicationFont(":/fonts/Hind-SemiBold");
     QFontDatabase::addApplicationFont(":/fonts/Hind-Regular");
     QFontDatabase::addApplicationFont(":/fonts/Hind-Light");
-	QFontDatabase::addApplicationFont(":/fonts/Montserrat-Bold");*/
+	QFontDatabase::addApplicationFont(":/fonts/Montserrat-Bold");
     /* Open CSS when configured */
     this->setStyleSheet(GUIUtil::loadStyleSheet());
 

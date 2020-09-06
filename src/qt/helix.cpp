@@ -26,7 +26,8 @@
 #include "walletmodel.h"
 #endif
 
-#include <startoptionsmain.h>						 
+#include <startoptionsmain.h>
+
 #include "init.h"
 #include "main.h"
 #include "rpc/server.h"
@@ -54,7 +55,6 @@
 #include <QTimer>
 #include <QTranslator>
 #include <vector>
-		 
 
 #if defined(QT_STATICPLUGIN)
 #include <QtPlugin>
@@ -196,8 +196,7 @@ private:
 
     /// Pass fatal exception message to UI thread
     void handleRunawayException(std::exception* e);
-	std::vector<std::string> words;
-					   
+    std::vector<std::string> words;
 };
 
 /** Main Helix application object */
@@ -218,8 +217,10 @@ public:
     bool createWindow(const NetworkStyle* networkStyle);
     /// Create splash screen
     void createSplashScreen(const NetworkStyle* networkStyle);
-	/// Get mnemonic words on first startup
-    bool setupMnemonicWords(std::vector<std::string>& wordlist);														
+
+    /// Get mnemonic words on first startup
+    bool setupMnemonicWords(std::vector<std::string>& wordlist);
+
     /// Request core initialization
     void requestInitialize();
     /// Request core shutdown
@@ -254,7 +255,7 @@ private:
     PaymentServer* paymentServer;
     WalletModel* walletModel;
 #endif
-	std::vector<std::string> wordlist;							  
+    std::vector<std::string> wordlist;
     int returnValue;
 
     void startThread();
@@ -564,8 +565,7 @@ int main(int argc, char* argv[])
 #endif
 
     Q_INIT_RESOURCE(helix_locale);
-	Q_INIT_RESOURCE(helix);
-
+    Q_INIT_RESOURCE(helix);
 
 #if QT_VERSION > 0x050100
     // Generate high-dpi pixmaps
@@ -577,7 +577,7 @@ int main(int argc, char* argv[])
 #ifdef Q_OS_MAC
     QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
 #endif
-	BitcoinApplication app(argc, argv);				   
+    BitcoinApplication app(argc, argv);
 
     // Register meta types used for QMetaObject::invokeMethod
     qRegisterMetaType<bool*>();

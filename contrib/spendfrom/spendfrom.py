@@ -35,9 +35,9 @@ def check_json_precision():
 def determine_db_dir():
     """Return the default location of the helix data directory"""
     if platform.system() == "Darwin":
-        return os.path.expanduser("~/Library/Application Support/HELIX/")
+        return os.path.expanduser("~/Library/Application Support/Helix/")
     elif platform.system() == "Windows":
-        return os.path.join(os.environ['APPDATA'], "HELIX")
+        return os.path.join(os.environ['APPDATA'], "Helix")
     return os.path.expanduser("~/.helix")
 
 def read_bitcoin_config(dbdir):

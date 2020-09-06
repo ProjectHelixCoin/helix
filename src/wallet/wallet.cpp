@@ -98,7 +98,6 @@ const CWalletTx* CWallet::GetWalletTx(const uint256& hash) const
     return &(it->second);
 }
 
-
 std::vector<CWalletTx> CWallet::getWalletTxs()
 {
     LOCK(cs_wallet);

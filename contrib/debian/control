@@ -1,8 +1,8 @@
 Source: helix
 Section: utils
 Priority: optional
-Maintainer: Fuzzbawls <fuzzbawls@gmail.com>
-Uploaders: Fuzzbawls <fuzzbawls@gmail.com>
+Maintainer: Julian Meyer <julian@helix.io>
+Uploaders: Julian Meyer <julian@helix.io>
 Build-Depends: debhelper,
  devscripts,
  automake,
@@ -30,14 +30,14 @@ Package: helixd
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: peer-to-peer network based digital currency - daemon
- HELIX is a free open source peer-to-peer electronic cash system that
+ Helix is a free open source peer-to-peer electronic cash system that
  is completely decentralized, without the need for a central server or
  trusted parties.  Users hold the crypto keys to their own money and
  transact directly with each other, with the help of a P2P network to
  check for double-spending.
  .
  Full transaction history is stored locally at each client.  This
- requires 10+ GB of space, slowly growing.
+ requires 1+ GB of space, slowly growing.
  .
  This package provides the daemon, helixd, and the CLI tool
  helix-cli to interact with the daemon.
@@ -46,7 +46,7 @@ Package: helix-qt
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: peer-to-peer network based digital currency - Qt GUI
- HELIX is a free open source peer-to-peer electronic cash system that
+ Helix is a free open source peer-to-peer electronic cash system that
  is completely decentralized, without the need for a central server or
  trusted parties.  Users hold the crypto keys to their own money and
  transact directly with each other, with the help of a P2P network to
@@ -55,4 +55,4 @@ Description: peer-to-peer network based digital currency - Qt GUI
  Full transaction history is stored locally at each client.  This
  requires 10+ GB of space, slowly growing.
  .
- This package provides Helix-Qt, a GUI for HELIX based on Qt.
+ This package provides Helix-Qt, a GUI for Helix based on Qt.

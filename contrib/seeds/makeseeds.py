@@ -8,9 +8,9 @@
 
 NSEEDS=512
 
-MAX_SEEDS_PER_ASN=4
+MAX_SEEDS_PER_ASN=2
 
-MIN_BLOCKS = 1530000
+MIN_BLOCKS = 1000000
 
 # These are hosts that have been observed to be behaving strangely (e.g.
 # aggressively connecting to every node).
@@ -26,11 +26,7 @@ import collections
 PATTERN_IPV4 = re.compile(r"^((\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})):(\d+)$")
 PATTERN_IPV6 = re.compile(r"^\[([0-9a-z:]+)\]:(\d+)$")
 PATTERN_ONION = re.compile(r"^([abcdefghijklmnopqrstuvwxyz234567]{16}\.onion):(\d+)$")
-PATTERN_AGENT = re.compile(
-    r"^/HELIXCore:("
-    r"4.0.(0|1|2|99|99.1|99.2)|"
-    r"4.1.(0|99)"
-    r")")
+PATTERN_AGENT = re.compile(r"^(/HelixCore:2.2.(0|1|99)/)$")
 
 def parseline(line):
     sline = line.split()

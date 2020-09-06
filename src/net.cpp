@@ -112,7 +112,7 @@ CCriticalSection cs_vAddedNodes;
 NodeId nLastNodeId = 0;
 CCriticalSection cs_nLastNodeId;
 
-static CSemaphore* semOutbound = NULL;
+static CSemahelix* semOutbound = NULL;
 boost::condition_variable messageHandlerCondition;
 
 // Signals for message handling
@@ -1302,7 +1302,7 @@ void static ProcessOneShot()
         vOneShots.pop_front();
     }
     CAddress addr;
-    CSemaphoreGrant grant(*semOutbound, true);
+    CSemahelixGrant grant(*semOutbound, true);
     if (grant) {
         if (!OpenNetworkConnection(addr, &grant, strDest.c_str(), true))
             AddOneShot(strDest);
@@ -1333,7 +1333,7 @@ void ThreadOpenConnections()
 
         MilliSleep(500);
 
-        CSemaphoreGrant grant(*semOutbound);
+        CSemahelixGrant grant(*semOutbound);
         boost::this_thread::interruption_point();
 
         // Add seed nodes if DNS seeds are all down (an infrastructure attack?).
@@ -1427,7 +1427,7 @@ void ThreadOpenAddedConnections()
             }
             for (string& strAddNode : lAddresses) {
                 CAddress addr;
-                CSemaphoreGrant grant(*semOutbound);
+                CSemahelixGrant grant(*semOutbound);
                 OpenNetworkConnection(addr, &grant, strAddNode.c_str());
                 MilliSleep(500);
             }
@@ -1469,7 +1469,7 @@ void ThreadOpenAddedConnections()
                         }
         }
         for (vector<CService>& vserv : lservAddressesToAdd) {
-            CSemaphoreGrant grant(*semOutbound);
+            CSemahelixGrant grant(*semOutbound);
             OpenNetworkConnection(CAddress(vserv[i % vserv.size()]), &grant);
             MilliSleep(500);
         }
@@ -1478,7 +1478,7 @@ void ThreadOpenAddedConnections()
 }
 
 // if successful, this moves the passed grant to the constructed node
-bool OpenNetworkConnection(const CAddress& addrConnect, CSemaphoreGrant* grantOutbound, const char* pszDest, bool fOneShot)
+bool OpenNetworkConnection(const CAddress& addrConnect, CSemahelixGrant* grantOutbound, const char* pszDest, bool fOneShot)
 {
     //
     // Initiate outbound network connection
@@ -1563,7 +1563,7 @@ void ThreadMessageHandler()
         {
             LOCK(cs_vNodes);
             for (CNode* pnode : vNodesCopy)
-                pnode->Release();
+            pnode->Release();
         }
 
         if (fSleep)
@@ -1728,9 +1728,9 @@ void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler)
     fAddressesInitialized = true;
 
     if (semOutbound == NULL) {
-        // initialize semaphore
+        // initialize semahelix
         int nMaxOutbound = min(MAX_OUTBOUND_CONNECTIONS, nMaxConnections);
-        semOutbound = new CSemaphore(nMaxOutbound);
+        semOutbound = new CSemahelix(nMaxOutbound);
     }
 
     if (pnodeLocalHost == NULL)
@@ -1791,12 +1791,12 @@ public:
     {
         // Close sockets
         for (CNode* pnode : vNodes)
-            if (pnode->hSocket != INVALID_SOCKET)
-                CloseSocket(pnode->hSocket);
+        if (pnode->hSocket != INVALID_SOCKET)
+            CloseSocket(pnode->hSocket);
         for (ListenSocket& hListenSocket : vhListenSocket)
-            if (hListenSocket.socket != INVALID_SOCKET)
-                if (!CloseSocket(hListenSocket.socket))
-                    LogPrintf("CloseSocket(hListenSocket) failed with error %s\n", NetworkErrorString(WSAGetLastError()));
+        if (hListenSocket.socket != INVALID_SOCKET)
+            if (!CloseSocket(hListenSocket.socket))
+                LogPrintf("CloseSocket(hListenSocket) failed with error %s\n", NetworkErrorString(WSAGetLastError()));
 
         // clean up some globals (to help leak detection)
         for (CNode* pnode : vNodes)

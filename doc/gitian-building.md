@@ -1,29 +1,29 @@
 Gitian building
 ================
 
-*Setup instructions for a gitian build of HELIX Core using a VM or physical system.*
+*Setup instructions for a Gitian build of Helix Core using a VM or physical system.*
 
-Gitian is the deterministic build process that is used to build the HELIX
+Gitian is the deterministic build process that is used to build the Helix
 Core executables. It provides a way to be reasonably sure that the
-executables are really built from source on GitHub. It also makes sure that
+executables are really built from the git source. It also makes sure that
 the same, tested dependencies are used and statically built into the executable.
 
 Multiple developers build the source code by following a specific descriptor
 ("recipe"), cryptographically sign the result, and upload the resulting signature.
-These results are compared and only if they match, the build is accepted and uploaded
-to the HELIX GitHub release page.
+These results are compared and only if they match, the build is accepted and provided
+for download.
 
-More independent gitian builders are needed, which is why this guide exists.
-It is preferred to follow these steps yourself instead of using someone else's
+More independent Gitian builders are needed, which is why this guide exists.
+It is preferred you follow these steps yourself instead of using someone else's
 VM image to avoid 'contaminating' the build.
 
 Table of Contents
 ------------------
 
 - [Preparing the Gitian builder host](#preparing-the-gitian-builder-host)
-  - [macOS Builds](#macos-builds)
-- [Initial Gitian Setup](#initial-gitian-setup)
-- [Building HELIX Core](#building-helix-core)
+- [Getting and building the inputs](#getting-and-building-the-inputs)
+- [Building Helix Core](#building-helix-core)
+- [Building an alternative repository](#building-an-alternative-repository)
 - [Signing externally](#signing-externally)
 - [Uploading signatures](#uploading-signatures)
 
@@ -33,106 +33,165 @@ Preparing the Gitian builder host
 The first step is to prepare the host environment that will be used to perform the Gitian builds.
 This guide explains how to set up the environment, and how to start the builds.
 
-Gitian builds are known to be working on recent versions of Windows 10, Debian, Ubuntu, Fedora and macOS.
+Gitian builds are known to be working on recent versions of Debian, Ubuntu and Fedora.
 If your machine is already running one of those operating systems, you can perform Gitian builds on the actual hardware.
 Alternatively, you can install one of the supported operating systems in a virtual machine.
 
 Any kind of virtualization can be used, for example:
-- [Docker](https://www.docker.com/) (covered by this guide)
+- [VirtualBox](https://www.virtualbox.org/) (covered by this guide)
 - [KVM](http://www.linux-kvm.org/page/Main_Page)
-- [LXC](https://linuxcontainers.org/)
+- [LXC](https://linuxcontainers.org/), see also [Gitian host docker container](https://github.com/gdm85/tenku/tree/master/docker/gitian-bitcoin-host/README.md).
 
 Please refer to the following documents to set up the operating systems and Gitian.
 
-|                          | Ubuntu/Debian                                                      | Fedora/CentOS                                                      | Windows                                                               | macOS
-|--------------------------|--------------------------------------------------------------------|--------------------------------------------------------------------|-----------------------------------------------------------------------|----------------------------------------------------------------
-| Setup Docker             |                                                                    |                                                                    | [Setup Docker for Windows](./gitian-building/docker-setup-windows.md) | [Setup Docker for macOS](./gitian-building/docker-setup-mac.md)
-| Setup WSL (windows only) |                                                                    |                                                                    | [Setup WSL for Windows](./gitian-building/wsl-setup-windows.md)       |
-| Setup Gitian             | [Setup Gitian on Ubuntu](./gitian-building/gitian-setup-ubuntu.md) | [Setup Gitian on Fedora](./gitian-building/gitian-setup-fedora.md) | [Setup Gitian on Windows](./gitian-building/gitian-setup-windows.md)  | [Setup Gitian on macOS](./gitian-building/gitian-setup-mac.md)
+|                                   | Debian                                                                             | Fedora                                                                             |
+|-----------------------------------|------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
+| Setup virtual machine (optional)  | [Create Debian VirtualBox](./gitian-building/gitian-building-create-vm-debian.md) | [Create Fedora VirtualBox](./gitian-building/gitian-building-create-vm-fedora.md) |
+| Setup Gitian                      | [Setup Gitian on Debian](./gitian-building/gitian-building-setup-gitian-debian.md) | [Setup Gitian on Fedora](./gitian-building/gitian-building-setup-gitian-fedora.md) |
 
-Note for users wishing to use LXC: A version of `lxc-execute` higher or equal to 2.1.1 is required.
-You can check the version with `lxc-execute --version`.
-On Debian you might have to compile a suitable version of lxc or you can use Ubuntu 18.04 or higher instead of Debian as the host.
 
-#### macOS Builds
+Getting and building the inputs
+--------------------------------
 
-In order to build and sign for macOS, you need to download the free SDK and extract a file. The steps are described [here](./gitian-building/gitian-building-mac-os-sdk.md). Alternatively, you can skip the macOS build by adding `--os=lw` below.
+At this point you have two options, you can either use the automated script (found in [https://github.com/helixproject/helix/blob/master/contrib/gitian-build.sh](https://github.com/helixproject/helix/blob/master/contrib/gitian-build.sh), only works in Debian/Ubuntu) or you could manually do everything by following this guide.
+If you are using the automated script, then run it with the `--setup` command. Afterwards, run it with the `--build` command (example: `contrib/gitian-build.sh -b signer 0.15.0`). Otherwise ignore this.
 
-Initial Gitian Setup
---------------------
+Follow the instructions in [https://github.com/helixproject/helix/blob/master/doc/release-process.md](https://github.com/helixproject/helix/blob/master/doc/release-process.md#fetch-and-create-inputs-first-time-or-when-dependency-versions-change)
+in the helix repository under 'Fetch and create inputs' to install sources which require
+manual intervention. Also optionally follow the next step: 'Seed the Gitian sources cache
+and offline git repositories' which will fetch the remaining files required for building
+offline.
 
-The `gitian-build.py` script is designed to checkout different release tags, commits, branches, or pull requests. The linked guides above cover the process of obtaining the script and doing the basic initial setup.
+Building Helix Core
+----------------
 
-Building HELIX Core
---------------------
+To build Helix Core (for Linux, OS X and Windows) just follow the steps under 'perform
+Gitian builds' in [https://github.com/helixproject/helix/blob/master/doc/release-process.md](https://github.com/helixproject/helix/blob/master/doc/release-process.md#setup-and-perform-gitian-builds) in the helix repository.
 
-The script allows you to build tags, commits, branches, and even pull requests. Below are some examples:
+This may take some time as it will build all the dependencies needed for each descriptor.
+These dependencies will be cached after a successful build to avoid rebuilding them when possible.
 
-* To build the 3.3.0 release tag:
-    ```bash
-    export NAME=satoshi
-    export VERSION=3.3.0
-    ./gitian-build.py --docker -b $NAME $VERSION
-    ```
-* To Build the master branch:
-    ```bash
-    export NAME=satoshi
-    export BRANCH=master
-    ./gitian-build.py --docker -b -c --detach-sign $NAME $BRANCH
-    ```
-* To Build a specific commit:
-    ```bash
-    export NAME=satoshi
-    export COMMIT=2269f10fd91b9dbfba0ecc43e4558b7590e3805c
-    ./gitian-build.py --docker -b -c --detach-sign $NAME $COMMIT
-    ```
-* To Build a pull request:
-    ```bash
-    export NAME=satoshi
-    export PRNUM=949
-    ./gitian-build.py --docker -b -p --detach-sign $NAME $PRNUM
-    ```
-To speed up the build, add `-j 6 -m 6000` to the list of arguments, where `6` is the number of CPU cores you wish to use (cannot exceed what is available), and 6000 is a little bit less than then the MB's of RAM you have.
-
-Note the use of the `--detach-sign` option in the examples above, which allows you to sign the build results on a machine other than the gitian host. Only release tags have their signatures signed and committed to a public repository.
-
-The build process results in a number of `.assert` files in your local gitian.sigs repository. Additionally, if you omit the `--detach-sign` option, the script will attempt to sign and commit these files for you.
-
-Signing Externally
---------------------
-
-If your gitian host does not have your GPG private key installed, you will need to copy these uncommited changes to your host machine, where you can sign them:
+At any time you can check the package installation and build progress with
 
 ```bash
-gpg --output ${VERSION}-linux/${NAME}/helix-linux-${VERSION%\.*}-build.assert.sig --detach-sign ${VERSION}-linux/$NAME/helix-linux-${VERSION%\.*}-build.assert
-gpg --output ${VERSION}-osx-unsigned/$NAME/helix-osx-${VERSION%\.*}-build.assert.sig --detach-sign ${VERSION}-osx-unsigned/$NAME/helix-osx-${VERSION%\.*}-build.assert
-gpg --output ${VERSION}-win-unsigned/$NAME/helix-win-${VERSION%\.*}-build.assert.sig --detach-sign ${VERSION}-win-unsigned/$NAME/helix-win-${VERSION%\.*}-build.assert
+tail -f var/install.log
+tail -f var/build.log
 ```
 
-Uploading Signatures
---------------------
-Make a Pull Request (both the `.assert` and `.assert.sig` files) to the
-[gitian.sigs](https://github.com/projecthelixcoin/gitian.sigs/) repository:
+Output from `gbuild` will look something like
+
+    Initialized empty Git repository in /home/gitianuser/gitian-builder/inputs/helix/.git/
+    remote: Counting objects: 57959, done.
+    remote: Total 57959 (delta 0), reused 0 (delta 0), pack-reused 57958
+    Receiving objects: 100% (57959/57959), 53.76 MiB | 484.00 KiB/s, done.
+    Resolving deltas: 100% (41590/41590), done.
+    From https://github.com/helixproject/helix
+    ... (new tags, new branch etc)
+    --- Building for trusty amd64 ---
+    Stopping target if it is up
+    Making a new image copy
+    stdin: is not a tty
+    Starting target
+    Checking if target is up
+    Preparing build environment
+    Updating apt-get repository (log in var/install.log)
+    Installing additional packages (log in var/install.log)
+    Grabbing package manifest
+    stdin: is not a tty
+    Creating build script (var/build-script)
+    lxc-start: Connection refused - inotify event with no name (mask 32768)
+    Running build script (log in var/build.log)
+
+Building an alternative repository
+-----------------------------------
+
+If you want to do a test build of a pull on GitHub it can be useful to point
+the Gitian builder at an alternative repository, using the same descriptors
+and inputs.
+
+For example:
+```bash
+URL=https://github.com/laanwj/bitcoin.git
+COMMIT=2014_03_windows_unicode_path
+./bin/gbuild --commit helix=${COMMIT} --url helix=${URL} ../helix/contrib/gitian-descriptors/gitian-linux.yml
+./bin/gbuild --commit helix=${COMMIT} --url helix=${URL} ../helix/contrib/gitian-descriptors/gitian-win.yml
+./bin/gbuild --commit helix=${COMMIT} --url helix=${URL} ../helix/contrib/gitian-descriptors/gitian-osx.yml
+```
+
+Building fully offline
+-----------------------
+
+For building fully offline including attaching signatures to unsigned builds, the detached-sigs repository
+and the helix git repository with the desired tag must both be available locally, and then gbuild must be
+told where to find them. It also requires an apt-cacher-ng which is fully-populated but set to offline mode, or
+manually disabling gitian-builder's use of apt-get to update the VM build environment.
+
+To configure apt-cacher-ng as an offline cacher, you will need to first populate its cache with the relevant
+files. You must additionally patch target-bin/bootstrap-fixup to set its apt sources to something other than
+plain archive.ubuntu.com: us.archive.ubuntu.com works.
+
+So, if you use LXC:
 
 ```bash
-git checkout -b ${VERSION}-not-codesigned
-git commit -S -a -m "Add $NAME $VERSION non-code signed signatures"
-git push --set-upstream $NAME $VERSION-not-codesigned
+export PATH="$PATH":/path/to/gitian-builder/libexec
+export USE_LXC=1
+cd /path/to/gitian-builder
+./libexec/make-clean-vm --suite trusty --arch amd64
+
+LXC_ARCH=amd64 LXC_SUITE=trusty on-target -u root apt-get update
+LXC_ARCH=amd64 LXC_SUITE=trusty on-target -u root \
+  -e DEBIAN_FRONTEND=noninteractive apt-get --no-install-recommends -y install \
+  $( sed -ne '/^packages:/,/[^-] .*/ {/^- .*/{s/"//g;s/- //;p}}' ../helix/contrib/gitian-descriptors/*|sort|uniq )
+LXC_ARCH=amd64 LXC_SUITE=trusty on-target -u root apt-get -q -y purge grub
+LXC_ARCH=amd64 LXC_SUITE=trusty on-target -u root -e DEBIAN_FRONTEND=noninteractive apt-get -y dist-upgrade
 ```
 
-You can also mail the files to Fuzzbawls (fuzzbawls@helix.org) and he will commit them.
+And then set offline mode for apt-cacher-ng:
+
+```
+/etc/apt-cacher-ng/acng.conf
+[...]
+Offlinemode: 1
+[...]
+
+service apt-cacher-ng restart
+```
+
+Then when building, override the remote URLs that gbuild would otherwise pull from the Gitian descriptors::
+```bash
+
+cd /some/root/path/
+git clone https://github.com/helixproject/helix-detached-sigs.git
+
+BTCPATH=/some/root/path/helix
+SIGPATH=/some/root/path/helix-detached-sigs
+
+./bin/gbuild --url helix=${BTCPATH},signature=${SIGPATH} ../helix/contrib/gitian-descriptors/gitian-win-signer.yml
+```
+
+Signing externally
+-------------------
+
+If you want to do the PGP signing on another device, that's also possible; just define `SIGNER` as mentioned
+and follow the steps in the build process as normal.
+
+    gpg: skipped "laanwj": secret key not available
+
+When you execute `gsign` you will get an error from GPG, which can be ignored. Copy the resulting `.assert` files
+in `gitian.sigs` to your signing machine and do
 
 ```bash
-gpg --detach-sign ${VERSION}-linux/${NAME}/helix-linux-*-build.assert
-gpg --detach-sign ${VERSION}-win-unsigned/${NAME}/helix-win-*-build.assert
-gpg --detach-sign ${VERSION}-osx-unsigned/${NAME}/helix-osx-*-build.assert
+    gpg --detach-sign ${VERSION}-linux/${SIGNER}/helix-linux-build.assert
+    gpg --detach-sign ${VERSION}-win/${SIGNER}/helix-win-build.assert
+    gpg --detach-sign ${VERSION}-osx-unsigned/${SIGNER}/helix-osx-build.assert
 ```
-
-You may have other .assert files as well (e.g. `signed` ones), in which case you should sign them too. You can see all of them by doing `ls ${VERSION}-*/${NAME}`.
 
 This will create the `.sig` files that can be committed together with the `.assert` files to assert your
 Gitian build.
 
- `./gitian-build.py --detach-sign -s $NAME $VERSION`
+Uploading signatures
+---------------------
 
-Make another pull request for these.
+After building and signing you can push your signatures (both the `.assert` and `.assert.sig` files) to the
+[helixproject/gitian.sigs](https://github.com/helixproject/gitian.sigs/) repository, or if that's not possible create a pull
+request. You can also mail the files to Wladimir (laanwj@gmail.com) and he will commit them.

@@ -44,7 +44,7 @@ QT_FORMS_UI = \
   qt/forms/startoptionssort.ui \
   qt/forms/startoptionsrevealed.ui \
   qt/forms/startoptionsmain.ui \
-   qt/forms/bip38tooldialog.ui \
+  qt/forms/bip38tooldialog.ui \
   qt/forms/coincontroldialog.ui \
   qt/forms/blockexplorer.ui \
   qt/forms/obfuscationconfig.ui \
