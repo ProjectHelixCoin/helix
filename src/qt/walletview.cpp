@@ -174,7 +174,7 @@ void WalletView::setBitcoinGUI(BitcoinGUI* gui)
 
         // Pass through transaction notifications
         connect(this, SIGNAL(incomingTransaction(QString, int, CAmount, QString, QString)), gui, SLOT(incomingTransaction(QString, int, CAmount, QString, QString)));
-    
+
         // Connect HD enabled state signal
         connect(this, SIGNAL(hdEnabledStatusChanged(int)), gui, SLOT(setHDStatus(int)));
     }
@@ -429,7 +429,7 @@ void WalletView::toggleLockWallet()
         AskPassphraseDialog dlg(AskPassphraseDialog::UnlockAnonymize, this, walletModel);
         dlg.exec();
     } else if (encStatus == walletModel->Unlocked || encStatus == walletModel->UnlockedForAnonymizationOnly) {
-       walletModel->setWalletLocked(true);
+            walletModel->setWalletLocked(true);
     }
 }
 

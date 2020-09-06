@@ -617,7 +617,7 @@ void BitcoinGUI::createToolBars()
         spacer->setMaximumHeight(20);
         //spacer->setSizePolicy(QSizePolicy::Fixed);
         toolbar->addWidget(spacer);
-        
+
 
         toolbar->addAction(overviewAction);
         toolbar->addAction(sendCoinsAction);

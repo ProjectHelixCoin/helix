@@ -81,14 +81,13 @@ public:
     QList<TransactionRecord> cachedWallet;
     bool hasZcTxes = false;
 
-
-    /* Query entire wallet anew from core.
+        /* Query entire wallet anew from core.
      */
     void refreshWallet()
     {
         qDebug() << "TransactionTablePriv::refreshWallet";
         cachedWallet.clear();
-       
+
         std::vector<CWalletTx> walletTxes = wallet->getWalletTxs();
 
         // Divide the work between multiple threads to speedup the process if the vector is larger than 4k txes

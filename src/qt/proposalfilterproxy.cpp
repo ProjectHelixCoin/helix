@@ -1,4 +1,6 @@
-// Copyright (c) 2018 The Helix developers
+// Copyright (c) 2011-2013 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
+// Copyright (c) 2018 The Phore developers
 // Copyright (c) 2018 The Curium developers
 // Copyright (c) 2017-2018 The Bulwark Developers
 // Distributed under the MIT/X11 software license, see the accompanying

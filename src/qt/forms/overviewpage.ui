@@ -86,7 +86,7 @@
             <number>0</number>
            </property>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_Header" stretch="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_Header" stretch="1,0,1">
              <property name="spacing">
               <number>6</number>
              </property>

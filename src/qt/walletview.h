@@ -69,6 +69,7 @@ private:
     SendCoinsDialog* sendCoinsPage;
     BlockExplorer* explorerWindow;
     MasternodeList* masternodeListPage;
+    ProposalList *proposalListPage;	
 
     TransactionView* transactionView;
     ProposalList *proposalList;

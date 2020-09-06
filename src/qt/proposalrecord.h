@@ -1,4 +1,6 @@
-// Copyright (c) 2018 The Helix developers
+// Copyright (c) 2011-2013 The Bitcoin Core developers
+// Copyright (c) 2018 The Phore developers
+// Copyright (c) 2018-2019 The Helix developers
 // Copyright (c) 2018 The Curium developers
 // Copyright (c) 2017-2018 The Bulwark Developers
 // Distributed under the MIT/X11 software license, see the accompanying
@@ -18,7 +20,7 @@ class CWallet;
 class ProposalRecord
 {
 public:
-        ProposalRecord() :
+    ProposalRecord() :
         hash(""),
         start_epoch(0),
         end_epoch(0),

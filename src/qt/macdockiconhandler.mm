@@ -33,7 +33,7 @@ bool dockClickHandler(id self,SEL _cmd,...) {
 void setupDockClickHandler() {
     Class cls = objc_getClass("NSApplication");
     id appInst = ((id (*)(id, SEL))objc_msgSend)((id)cls, sel_registerName("sharedApplication"));
-
+    
     if (appInst != NULL) {
         id delegate = ((id (*)(id, SEL))objc_msgSend)(appInst, sel_registerName("delegate"));
         Class delClass = (Class)((id (*)(id, SEL))objc_msgSend)(delegate,  sel_registerName("class"));
