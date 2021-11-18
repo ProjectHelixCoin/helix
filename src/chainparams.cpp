@@ -2,8 +2,7 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The PIVX developers
-// Copyright (c) 2017-2018 The Phore developers
-// Copyright (c) 2018-2019 The Helix developers
+// Copyright (c) 2019 The Helix Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -16,6 +15,7 @@
 #include <assert.h>
 
 #include <boost/assign/list_of.hpp>
+#include <limits>
 
 using namespace std;
 using namespace boost::assign;
@@ -140,6 +140,18 @@ libzerocoin::ZerocoinParams* CChainParams::OldZerocoin_Params() const
     return &ZCParams;
 }
 
+bool CChainParams::HasStakeMinAgeOrDepth(const int contextHeight, const uint32_t contextTime,
+                                         const int utxoFromBlockHeight, const uint32_t utxoFromBlockTime) const
+{
+    // before stake modifier V2, the age required was 3 * 60 * 60 (3 hour) / not required on regtest
+    if (!IsStakeModifierV2(contextHeight))
+        return (NetworkID() == CBaseChainParams::REGTEST || (utxoFromBlockTime + 10800 <= contextTime));
+
+    // after stake modifier V2, we require the utxo to be nStakeMinDepth deep in the chain
+    return (contextHeight - utxoFromBlockHeight >= nStakeMinDepth);
+}
+
+
 class CMainParams : public CChainParams
 {
 public:
@@ -165,8 +177,10 @@ public:
         nRejectBlockOutdatedMajority = 950;
         nToCheckBlockUpgradeMajority = 1000;
         nMinerThreads = 0;
-        nTargetTimespan = 1 * 60; // Helix: 1 day
         nTargetSpacing = 1 * 60;  // Helix: 1 minute
+        nStakeMinDepth = 600;
+        nFutureTimeDriftPoW = 7200;
+        nFutureTimeDriftPoS = 180;
         nMaturity = 50;
         nMasternodeCountDrift = 20;
         nMaxMoneyOut = 1000000000 * COIN;
@@ -238,6 +252,8 @@ public:
         strSporkKey = "046c4492a5b596c4ab60891dafef157a50d668b555989b8330fe2ec14a93993e50e306b0e63a561d4f5d225a34b1387735d47c9fe315795be6fdcfeb7ff06a73be";
         strObfuscationPoolDummyAddress = "HDw5WYmcSePwTxRZcDfzWmZnG3KNdtktgB";
 
+        nBlockStakeModifierlV2 = 1747800; // this will be set at a later date
+
         /** Zerocoin */
         zerocoinModulus = "25195908475657893494027183240048398571429282126204032027777137836043662020707595556264018525880784"
             "4069182906412495150821892985591491761845028084891200728449926873928072877767359714183472702618963750149718246911"
@@ -285,9 +301,9 @@ public:
         nRejectBlockOutdatedMajority = 75;
         nToCheckBlockUpgradeMajority = 100;
         nMinerThreads = 0;
-        nTargetTimespan = 1 * 60; // Helix: 1 day
         nTargetSpacing = 1 * 10;  // Helix: 1 minute
         nMaturity = 15;
+        nStakeMinDepth = 100;
         nMasternodeCountDrift = 4;
         nModifierUpdateBlock = 51197; //approx Mon, 17 Apr 2017 04:00:00 GMT
         nMaxMoneyOut = 43199500 * COIN;
@@ -324,13 +340,14 @@ public:
         fMiningRequiresPeers = true;
         fAllowMinDifficultyBlocks = true;
         fDefaultConsistencyChecks = false;
-        fRequireStandard = false;
+        fRequireStandard = true;
         fMineBlocksOnDemand = false;
         fTestnetToBeDeprecatedFieldRPC = true;
 
         nPoolMaxTransactions = 2;
         strSporkKey = "04dcf81391f0d56b027add70054ab55e7bc978b925d4a88e572292e4bfe99c132dcbd91ca4fdf7239f6705aa5242ad9d0f81bb6add73bc91ffdcb57e61da2a201a"; 
         strObfuscationPoolDummyAddress = "";
+        nBlockStakeModifierlV2 = 1500; // this will be set at a later date
         nBudgetFeeConfirmations = 3; // Number of confirmations for the finalization fee. We have to make this very short
                                      // here because we only have a 8 block finalization window on testnet
     }
@@ -359,16 +376,18 @@ public:
         nRejectBlockOutdatedMajority = 950;
         nToCheckBlockUpgradeMajority = 1000;
         nMinerThreads = 1;
-        nTargetTimespan = 24 * 60 * 60; // Helix: 1 day
         nTargetSpacing = 1 * 60;        // Helix: 1 minutes
         bnProofOfWorkLimit = ~uint256(0) >> 1;
         genesis.nTime = 1531496589;
         genesis.nBits = 0x207fffff;
         genesis.nNonce = 192837;
         nMaturity = 0;
+        nStakeMinDepth = 0;
         nLastPOWBlock = 999999999; // PoS complicates Regtest because of timing issues
         nZerocoinLastOldParams = 499;
         nZerocoinStartHeight = 100;
+
+        nBlockStakeModifierlV2 = std::numeric_limits<int>::max(); // max integer value (never switch on regtest)
 
         hashGenesisBlock = genesis.GetHash();
         nDefaultPort = 37417;

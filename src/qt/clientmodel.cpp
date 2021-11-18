@@ -18,6 +18,7 @@
 #include "masternode-sync.h"
 #include "masternodeman.h"
 #include "net.h"
+#include "netbase.h"
 #include "ui_interface.h"
 #include "util.h"
 
@@ -285,17 +286,35 @@ static void BannedListChanged(ClientModel *clientmodel)
 void ClientModel::subscribeToCoreSignals()
 {
     // Connect signals to client
-    uiInterface.ShowProgress.connect(boost::bind(ShowProgress, this, _1, _2));
-    uiInterface.NotifyNumConnectionsChanged.connect(boost::bind(NotifyNumConnectionsChanged, this, _1));
-    uiInterface.NotifyAlertChanged.connect(boost::bind(NotifyAlertChanged, this, _1, _2));
+    uiInterface.ShowProgress.connect(boost::bind(ShowProgress, this, boost::arg<1>(), boost::arg<2>()));
+    uiInterface.NotifyNumConnectionsChanged.connect(boost::bind(NotifyNumConnectionsChanged, this, boost::arg<1>()));
+    uiInterface.NotifyAlertChanged.connect(boost::bind(NotifyAlertChanged, this, boost::arg<1>(), boost::arg<2>()));
     uiInterface.BannedListChanged.connect(boost::bind(BannedListChanged, this));
 }
 
 void ClientModel::unsubscribeFromCoreSignals()
 {
     // Disconnect signals from client
-    uiInterface.ShowProgress.disconnect(boost::bind(ShowProgress, this, _1, _2));
-    uiInterface.NotifyNumConnectionsChanged.disconnect(boost::bind(NotifyNumConnectionsChanged, this, _1));
-    uiInterface.NotifyAlertChanged.disconnect(boost::bind(NotifyAlertChanged, this, _1, _2));
+    uiInterface.ShowProgress.disconnect(boost::bind(ShowProgress, this, boost::arg<1>(), boost::arg<2>()));
+    uiInterface.NotifyNumConnectionsChanged.disconnect(boost::bind(NotifyNumConnectionsChanged, this, boost::arg<1>()));
+    uiInterface.NotifyAlertChanged.disconnect(boost::bind(NotifyAlertChanged, this, boost::arg<1>(), boost::arg<2>()));
     uiInterface.BannedListChanged.disconnect(boost::bind(BannedListChanged, this));
+}
+
+bool ClientModel::getTorInfo(std::string& ip_port) const
+{
+    proxyType onion;
+    if (GetProxy((Network) 3, onion) && IsReachable((Network) 3)) {
+        {
+            LOCK(cs_mapLocalHost);
+            for (const std::pair<const CNetAddr, LocalServiceInfo> &item : mapLocalHost) {
+                if (item.first.IsTor()) {
+                     CService addrOnion = CService(item.first.ToString(), item.second.nPort);
+                     ip_port = addrOnion.ToStringIPPort();
+                     return true;
+                }
+            }
+        }
+    }
+    return false;
 }

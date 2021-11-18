@@ -74,7 +74,7 @@ class Mutex {
 
 // the Win32 API offers a dependable condition variable mechanism, but only starting with
 // Windows 2008 and Vista
-// no matter what we will implement our own condition variable with a semaphore
+// no matter what we will implement our own condition variable with a semahelix
 // implementation as described in a paper written by Andrew D. Birrell in 2003
 class CondVar {
  public:
@@ -85,14 +85,14 @@ class CondVar {
   void SignalAll();
  private:
   Mutex* mu_;
-  
+
   Mutex wait_mtx_;
   long waiting_;
-  
+
   void * sem1_;
   void * sem2_;
-  
-  
+
+
 };
 
 class OnceType {
@@ -123,7 +123,7 @@ class AtomicPointer {
   void * rep_;
  public:
   AtomicPointer() : rep_(NULL) { }
-  explicit AtomicPointer(void* v); 
+  explicit AtomicPointer(void* v);
   void* Acquire_Load() const;
 
   void Release_Store(void* v);
@@ -167,6 +167,9 @@ inline bool Snappy_Uncompress(const char* input, size_t length,
 inline bool GetHeapProfile(void (*func)(void*, const char*, int), void* arg) {
   return false;
 }
+
+bool HasAcceleratedCRC32C();
+uint32_t AcceleratedCRC32C(uint32_t crc, const char* buf, size_t size);
 
 }
 }

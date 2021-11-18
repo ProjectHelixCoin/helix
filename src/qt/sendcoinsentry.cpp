@@ -1,8 +1,7 @@
 // Copyright (c) 2011-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The PIVX developers
-// Copyright (c) 2017-2018 The Phore developers
-// Copyright (c) 2018-2019 The Helix developers
+// Copyright (c) 2019 The Helix Developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -32,9 +31,7 @@ SendCoinsEntry::SendCoinsEntry(QWidget* parent) : QStackedWidget(parent),
     ui->addAsLabel->setAttribute(Qt::WA_MacShowFocusRect, 0);
     ui->payAmount->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
-#if QT_VERSION >= 0x040700
     ui->addAsLabel->setPlaceholderText(tr("Enter a label for this address to add it to your address book"));
-#endif
 
     // normal helix address field
     GUIUtil::setupAddressWidget(ui->payTo, this);

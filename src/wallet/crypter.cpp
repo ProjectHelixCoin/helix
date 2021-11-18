@@ -23,7 +23,7 @@ bool CCrypter::SetKeyFromPassphrase(const SecureString& strKeyData, const std::v
     int i = 0;
     if (nDerivationMethod == 0)
         i = EVP_BytesToKey(EVP_aes_256_cbc(), EVP_sha512(), &chSalt[0],
-            (unsigned char*)&strKeyData[0], strKeyData.size(), nRounds, chKey, chIV);
+                           (unsigned char*)&strKeyData[0], strKeyData.size(), nRounds, chKey, chIV);
 
     if (i != (int)WALLET_CRYPTO_KEY_SIZE) {
         memory_cleanse(chKey, sizeof(chKey));
@@ -58,32 +58,32 @@ bool CCrypter::Encrypt(const CKeyingMaterial& vchPlaintext, std::vector<unsigned
     int nCLen = nLen + AES_BLOCK_SIZE, nFLen = 0;
     vchCiphertext = std::vector<unsigned char>(nCLen);
 
-    #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-        EVP_CIPHER_CTX* ctx;
-    #else
-        EVP_CIPHER_CTX ctx;
-    #endif
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+    EVP_CIPHER_CTX* ctx;
+#else
+    EVP_CIPHER_CTX ctx;
+#endif
 
-        bool fOk = true;
+    bool fOk = true;
 
-    #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-        ctx = EVP_CIPHER_CTX_new();
-        EVP_CIPHER_CTX_init(ctx);
-    #else
-        EVP_CIPHER_CTX_init (&ctx);
-    #endif
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+    ctx = EVP_CIPHER_CTX_new();
+    EVP_CIPHER_CTX_init(ctx);
+#else
+    EVP_CIPHER_CTX_init (&ctx);
+#endif
 
-    #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-        if (fOk) fOk = EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, chKey, chIV) != 0;
-        if (fOk) fOk = EVP_EncryptUpdate(ctx, &vchCiphertext[0], &nCLen, &vchPlaintext[0], nLen) != 0;
-        if (fOk) fOk = EVP_EncryptFinal_ex(ctx, (&vchCiphertext[0]) + nCLen, &nFLen) != 0;
-        EVP_CIPHER_CTX_cleanup(ctx);
-    #else
-        if (fOk) fOk = EVP_EncryptInit_ex(&ctx, EVP_aes_256_cbc(), NULL, chKey, chIV) != 0;
-        if (fOk) fOk = EVP_EncryptUpdate(&ctx, &vchCiphertext[0], &nCLen, &vchPlaintext[0], nLen) != 0;
-        if (fOk) fOk = EVP_EncryptFinal_ex(&ctx, (&vchCiphertext[0]) + nCLen, &nFLen) != 0;
-        EVP_CIPHER_CTX_cleanup(&ctx);
-    #endif
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+    if (fOk) fOk = EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, chKey, chIV) != 0;
+    if (fOk) fOk = EVP_EncryptUpdate(ctx, &vchCiphertext[0], &nCLen, &vchPlaintext[0], nLen) != 0;
+    if (fOk) fOk = EVP_EncryptFinal_ex(ctx, (&vchCiphertext[0]) + nCLen, &nFLen) != 0;
+    EVP_CIPHER_CTX_cleanup(ctx);
+#else
+    if (fOk) fOk = EVP_EncryptInit_ex(&ctx, EVP_aes_256_cbc(), NULL, chKey, chIV) != 0;
+    if (fOk) fOk = EVP_EncryptUpdate(&ctx, &vchCiphertext[0], &nCLen, &vchPlaintext[0], nLen) != 0;
+    if (fOk) fOk = EVP_EncryptFinal_ex(&ctx, (&vchCiphertext[0]) + nCLen, &nFLen) != 0;
+    EVP_CIPHER_CTX_cleanup(&ctx);
+#endif
 
     if (!fOk) return false;
 
@@ -102,32 +102,32 @@ bool CCrypter::Decrypt(const std::vector<unsigned char>& vchCiphertext, CKeyingM
 
     vchPlaintext = CKeyingMaterial(nPLen);
 
-    #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-        EVP_CIPHER_CTX* ctx;
-    #else
-        EVP_CIPHER_CTX ctx;
-    #endif
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+    EVP_CIPHER_CTX* ctx;
+#else
+    EVP_CIPHER_CTX ctx;
+#endif
 
-        bool fOk = true;
+    bool fOk = true;
 
-    #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-        ctx = EVP_CIPHER_CTX_new();
-        EVP_CIPHER_CTX_init(ctx);
-    #else
-        EVP_CIPHER_CTX_init (&ctx);
-    #endif
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+    ctx = EVP_CIPHER_CTX_new();
+    EVP_CIPHER_CTX_init(ctx);
+#else
+    EVP_CIPHER_CTX_init (&ctx);
+#endif
 
-    #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-        if (fOk) fOk = EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, chKey, chIV) != 0;
-        if (fOk) fOk = EVP_DecryptUpdate(ctx, &vchPlaintext[0], &nPLen, &vchCiphertext[0], nLen) != 0;
-        if (fOk) fOk = EVP_DecryptFinal_ex(ctx, (&vchPlaintext[0]) + nPLen, &nFLen) != 0;
-        EVP_CIPHER_CTX_cleanup(ctx);
-    #else
-        if (fOk) fOk = EVP_DecryptInit_ex(&ctx, EVP_aes_256_cbc(), NULL, chKey, chIV) != 0;
-        if (fOk) fOk = EVP_DecryptUpdate(&ctx, &vchPlaintext[0], &nPLen, &vchCiphertext[0], nLen) != 0;
-        if (fOk) fOk = EVP_DecryptFinal_ex(&ctx, (&vchPlaintext[0]) + nPLen, &nFLen) != 0;
-        EVP_CIPHER_CTX_cleanup(&ctx);
-    #endif
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+    if (fOk) fOk = EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, chKey, chIV) != 0;
+    if (fOk) fOk = EVP_DecryptUpdate(ctx, &vchPlaintext[0], &nPLen, &vchCiphertext[0], nLen) != 0;
+    if (fOk) fOk = EVP_DecryptFinal_ex(ctx, (&vchPlaintext[0]) + nPLen, &nFLen) != 0;
+    EVP_CIPHER_CTX_cleanup(ctx);
+#else
+    if (fOk) fOk = EVP_DecryptInit_ex(&ctx, EVP_aes_256_cbc(), NULL, chKey, chIV) != 0;
+    if (fOk) fOk = EVP_DecryptUpdate(&ctx, &vchPlaintext[0], &nPLen, &vchCiphertext[0], nLen) != 0;
+    if (fOk) fOk = EVP_DecryptFinal_ex(&ctx, (&vchPlaintext[0]) + nPLen, &nFLen) != 0;
+    EVP_CIPHER_CTX_cleanup(&ctx);
+#endif
 
     if (!fOk) return false;
 
@@ -167,7 +167,7 @@ bool EncryptAES256(const SecureString& sKey, const SecureString& sPlaintext, con
 
     // Perform the encryption
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-    EVP_CIPHER_CTX* ctx;
+    EVP_CIPHER_CTX* ctx = nullptr;
 #else
     EVP_CIPHER_CTX ctx;
 #endif
@@ -180,7 +180,7 @@ bool EncryptAES256(const SecureString& sKey, const SecureString& sPlaintext, con
     if (fOk) fOk = EVP_EncryptUpdate(ctx, (unsigned char*)&sCiphertext[0], &nCLen, (const unsigned char*)&sPlaintext[0], nLen);
     if (fOk) fOk = EVP_EncryptFinal_ex(ctx, (unsigned char*)(&sCiphertext[0]) + nCLen, &nFLen);
     EVP_CIPHER_CTX_cleanup(ctx);
-#else    
+#else
     EVP_CIPHER_CTX_init(&ctx);
     if (fOk) fOk = EVP_EncryptInit_ex(&ctx, EVP_aes_256_cbc(), NULL, (const unsigned char*)&sKey[0], (const unsigned char*)&sIV[0]);
     if (fOk) fOk = EVP_EncryptUpdate(&ctx, (unsigned char*)&sCiphertext[0], &nCLen, (const unsigned char*)&sPlaintext[0], nLen);
@@ -675,7 +675,7 @@ bool CCryptoKeyStore::AddDeterministicSeed(const uint256& seed)
         }
         strErr = "save zhlixseed to wallet";
     }
-                //the use case for this is no password set seed, mint dzHLIX,
+    //the use case for this is no password set seed, mint dzHLIX,
 
     return error("s%: Failed to %s\n", __func__, strErr);
 }

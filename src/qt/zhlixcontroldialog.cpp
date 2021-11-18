@@ -16,7 +16,7 @@ std::set<std::string> ZHlixControlDialog::setSelectedMints;
 std::set<CMintMeta> ZHlixControlDialog::setMints;
 
 ZHlixControlDialog::ZHlixControlDialog(QWidget *parent) :
-    QDialog(parent),
+    QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
     ui(new Ui::ZHlixControlDialog),
     model(0)
 {

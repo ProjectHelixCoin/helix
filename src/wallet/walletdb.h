@@ -163,7 +163,7 @@ public:
     bool WriteCryptedHDChain(const CHDChain& chain);
     bool WriteHDPubKey(const CHDPubKey& hdPubKey, const CKeyMetadata& keyMeta);
 
-    
+
     bool WriteDeterministicMint(const CDeterministicMint& dMint);
     bool ReadDeterministicMint(const uint256& hashPubcoin, CDeterministicMint& dMint);
     bool EraseDeterministicMint(const uint256& hashPubcoin);

@@ -133,7 +133,7 @@ CAmount CzHLIXTracker::GetBalance(bool fConfirmedOnly, bool fUnconfirmedOnly) co
     }
 
     {
-        //LOCK(cs_hlixtracker);
+        //LOCK(cs_phrtracker);
         // Get Unused coins
         for (auto& it : mapSerialHashes) {
             CMintMeta meta = it.second;

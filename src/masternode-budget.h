@@ -369,7 +369,7 @@ public:
         return true;
     }
 
-     // Verify and vote on finalized budget 
+    // Verify and vote on finalized budget
     void CheckAndVote();
     //total helix paid out by this budget
     CAmount GetTotalPayout();

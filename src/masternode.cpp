@@ -466,7 +466,7 @@ bool CMasternodeBroadcast::CheckDefaultPort(std::string strService, std::string&
     if(Params().NetworkID() == CBaseChainParams::REGTEST) {
         return true;
     }
-    
+
     CService service = CService(strService);
     int nDefaultPort = Params().GetDefaultPort();
 
@@ -698,7 +698,7 @@ std::string CMasternodeBroadcast::GetOldStrMessage()
     std::string vchPubKey(pubKeyCollateralAddress.begin(), pubKeyCollateralAddress.end());
     std::string vchPubKey2(pubKeyMasternode.begin(), pubKeyMasternode.end());
     strMessage = addr.ToString() + std::to_string(sigTime) + vchPubKey + vchPubKey2 + std::to_string(protocolVersion);
-	
+
     return strMessage;
 }
 
@@ -707,7 +707,7 @@ std:: string CMasternodeBroadcast::GetNewStrMessage()
     std::string strMessage;
 
     strMessage = addr.ToString() + std::to_string(sigTime) + pubKeyCollateralAddress.GetID().ToString() + pubKeyMasternode.GetID().ToString() + std::to_string(protocolVersion);
-	
+
     return strMessage;
 }
 
@@ -749,8 +749,9 @@ bool CMasternodePing::Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode)
     return true;
 }
 
-bool CMasternodePing::VerifySignature(CPubKey& pubKeyMasternode, int &nDos) {
-	std::string strMessage = vin.ToString() + blockHash.ToString() + std::to_string(sigTime);
+bool CMasternodePing::VerifySignature(CPubKey& pubKeyMasternode, int &nDos)
+{
+    std::string strMessage = vin.ToString() + blockHash.ToString() + std::to_string(sigTime);
 	std::string errorMessage = "";
 
 	if(!obfuScationSigner.VerifyMessage(pubKeyMasternode, vchSig, strMessage, errorMessage)){

@@ -200,12 +200,12 @@ class Application :
 		makeDirs(self._rootPath)
 		print('Root path: %s' % (self._rootPath))
 		
-		self._helixd = os.getenv('PHORED', None)
+		self._helixd = os.getenv('HELIXD', None)
 		if not self._helixd :
-			die('Undefined PHORED')
-		self._helixCli = os.getenv('PHORECLI', None)
+			die('Undefined HELIXD')
+		self._helixCli = os.getenv('HELIXCLI', None)
 		if not self._helixCli :
-			die('Undefined PHORECLI')
+			die('Undefined HELIXCLI')
 		print('helixd: %s' % (self._helixd))
 	
 	def _cleanup(self) :

@@ -1,6 +1,6 @@
 usr/local/bin/helix-qt usr/bin
-share/pixmaps/helix32.xpm usr/share/pixmaps
-share/pixmaps/helix16.xpm usr/share/pixmaps
-share/pixmaps/helix128.png usr/share/pixmaps
+share/pixmaps/bitcoin32.xpm usr/share/pixmaps
+share/pixmaps/bitcoin16.xpm usr/share/pixmaps
+share/pixmaps/bitcoin128.png usr/share/pixmaps
 debian/helix-qt.desktop usr/share/applications
 debian/helix-qt.protocol usr/share/kde4/services/

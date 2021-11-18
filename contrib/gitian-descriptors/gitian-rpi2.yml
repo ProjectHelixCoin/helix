@@ -1,5 +1,5 @@
 ---
-name: "helix-rpi2-1.6"
+name: "helix-rpi2-1.8"
 enable_cache: true
 suites:
 - "trusty"

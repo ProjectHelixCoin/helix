@@ -14,14 +14,11 @@
 
 #include <QUrl>
 
-OpenURIDialog::OpenURIDialog(QWidget* parent) : QDialog(parent),
+OpenURIDialog::OpenURIDialog(QWidget* parent) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
                                                 ui(new Ui::OpenURIDialog)
 {
     ui->setupUi(this);
-    ui->uriEdit->setAttribute(Qt::WA_MacShowFocusRect, 0);
-#if QT_VERSION >= 0x040700
     ui->uriEdit->setPlaceholderText("helix:");
-#endif
 }
 
 OpenURIDialog::~OpenURIDialog()

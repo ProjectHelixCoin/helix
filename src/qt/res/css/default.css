@@ -122,7 +122,7 @@ QTabWidget::pane {
     border:0;
 }
 QTabBar {
-	background-color: #f2f2f2;;
+	background-color: transparent;;
 	color: #333;
 }
 QTabBar::tab:hover:!selected {
@@ -261,6 +261,7 @@ QComboBox {
 	background: #fcfcfc;
 	min-height: 25px;
 	color: #818181;
+	border: 0;
 	font-size: 11px;
 	min-height: 20px;
 	outline: 0;
@@ -294,7 +295,7 @@ QComboBox::down-arrow {
 }
 QComboBox QListView {
 	background: #fff;
-	border:1px solid #333;
+	border: 0;
 	padding-right: 1px;
 	padding-left: 1px;
 	color: #818181;
@@ -311,7 +312,7 @@ QComboBox::item:alternate {
 }
 QComboBox::item:selected {
 	border: 0px solid transparent;
-	background: #f2f2f2;
+	background: Highlight;
 	color: #232828;
 }
 QComboBox::indicator {
@@ -325,7 +326,6 @@ QAbstractSpinBox {
 	min-height: 20px;
 	background-color: rgba(255, 255, 255, 0.08);
 	color: #818181;
-	border:1px solid #232828;
 	padding: 0.6em 0.85em 0.6em;
 	border-radius: 8px;
 }
@@ -338,9 +338,8 @@ QAbstractSpinBox::up-button {
 	subcontrol-origin: border;
 	subcontrol-position: top right;
 	width: 21px;
-	background: #fcfcfc;
-	border-right:1px solid #232828;
-	border-top:1px solid #232828;
+	background: transparent;
+	border: 0;
 	padding-right: 1px;
 	padding-left: 5px;
 	padding-top: 2px;
@@ -352,10 +351,9 @@ QAbstractSpinBox::down-button {
 	subcontrol-origin: border;
 	subcontrol-position: bottom right;
 	width: 21px;
-	background: #fcfcfc;
+	background: transparent;
 	border-top: 0px;
-	border-right:1px solid #232828;
-	border-bottom:1px solid #232828;
+	border: 0;
 	padding-right: 1px;
 	padding-left: 5px;
 	padding-bottom: 2px;
@@ -379,7 +377,7 @@ QHeaderView::section {
 	qproperty-defaultAlignment: AlignVCenter; */
 	qproperty-defaultAlignment: AlignLeft AlignVCenter;
 	qproperty-alignment: left;
-	background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 0.25, stop: 0 #232828, stop: 1 #232828);
+	background-color: transparent;
 	color: #fff;
 	min-height:30px;
 	font-weight: bold;
@@ -413,7 +411,7 @@ QHeaderView::section:hover {
 #tableWidgetMyMasternodes {
 	/* Table - has to be selected as a class otherwise it throws off QCalendarWidget */
 	background: transparent;
-	border: 1px;
+	border: none;
 	alternate-background-color: transparent;
 	padding-right: 12px;
 }
@@ -423,28 +421,21 @@ QTableView::item,
 	/* Table Item */
 	background-color: transparent;
 	font-size: 12px;
+	color: white;
 	border: 0;
-	border-bottom: 1px solid rgba(0, 0, 0);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+	/* border-top: 1px solid rgba(255, 255, 255, 0.05); */
 	padding-right: 12px;
 	qproperty-alignment: 'AlignLeft';
-    	text-align: left;
-}
-QTableView#tableWidgetMyMasternodes::item:selected {
-	/* Table Item */
-	background-color: #333;
-	font-size: 12px;
-	border: 0;
-	color: #fff;
-	padding-right: 12px;
-	qproperty-alignment: 'AlignLeft';
-    	text-align: left;
+    text-align: left;
+
 }
 QTableView::item:selected {
 	/* Table Item Selected */
 	/* background-color:#00CD8D; */
 	/* background-color:rgba(0,209,136,0.25); */
-	background: #232828;
-    	color: #fff;
+	background: Highlight;
+    color: #fff;
    
 }
 QTableWidget {

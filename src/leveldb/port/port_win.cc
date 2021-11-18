@@ -32,6 +32,7 @@
 
 #include <windows.h>
 #include <cassert>
+#include <intrin.h>
 
 namespace leveldb {
 namespace port {
@@ -70,8 +71,8 @@ void Mutex::AssertHeld() {
 CondVar::CondVar(Mutex* mu) :
     waiting_(0), 
     mu_(mu), 
-    sem1_(::CreateSemaphore(NULL, 0, 10000, NULL)),
-    sem2_(::CreateSemaphore(NULL, 0, 10000, NULL)) {
+    sem1_(::CreateSemahelix(NULL, 0, 10000, NULL)),
+    sem2_(::CreateSemahelix(NULL, 0, 10000, NULL)) {
   assert(mu_);
 }
 
@@ -91,7 +92,7 @@ void CondVar::Wait() {
 
   // initiate handshake
   ::WaitForSingleObject(sem1_, INFINITE);
-  ::ReleaseSemaphore(sem2_, 1, NULL);
+  ::ReleaseSemahelix(sem2_, 1, NULL);
   mu_->Lock();
 }
 
@@ -101,7 +102,7 @@ void CondVar::Signal() {
     --waiting_;
 
     // finalize handshake
-    ::ReleaseSemaphore(sem1_, 1, NULL);
+    ::ReleaseSemahelix(sem1_, 1, NULL);
     ::WaitForSingleObject(sem2_, INFINITE);
   }
   wait_mtx_.Unlock();
@@ -109,7 +110,7 @@ void CondVar::Signal() {
 
 void CondVar::SignalAll() {
   wait_mtx_.Lock();
-  ::ReleaseSemaphore(sem1_, waiting_, NULL);
+  ::ReleaseSemahelix(sem1_, waiting_, NULL);
   while(waiting_ > 0) {
     --waiting_;
     ::WaitForSingleObject(sem2_, INFINITE);
@@ -141,6 +142,16 @@ void* AtomicPointer::NoBarrier_Load() const {
 
 void AtomicPointer::NoBarrier_Store(void* v) {
   rep_ = v;
+}
+
+bool HasAcceleratedCRC32C() {
+#if defined(__x86_64__) || defined(__i386__)
+  int cpu_info[4];
+  __cpuid(cpu_info, 1);
+  return (cpu_info[2] & (1 << 20)) != 0;
+#else
+  return false;
+#endif
 }
 
 }

@@ -114,9 +114,9 @@ HEADERS += src/activemasternode.h \
            src/protocol.h \
            src/pubkey.h \
            src/random.h \
-           src/rpcclient.h \
-           src/rpcprotocol.h \
-           src/rpcserver.h \
+           src/rpc/client.h \
+           src/rpc/protocol.h \
+           src/rpc/server.h \
            src/serialize.h \
            src/spork.h \
            src/streams.h \
@@ -137,8 +137,8 @@ HEADERS += src/activemasternode.h \
            src/utiltime.h \
            src/version.h \
            src/wallet.h \
-           src/wallet_ismine.h \
-           src/walletdb.h \
+           src/wallet/wallet_ismine.h \
+           src/wallet/walletdb.h \
            src/validationinterface.h \
            src/compat/sanity.h \
            src/consensus/merkle.h \
@@ -418,18 +418,18 @@ SOURCES += src/activemasternode.cpp \
            src/pubkey.cpp \
            src/random.cpp \
            src/rest.cpp \
-           src/rpcblockchain.cpp \
-           src/rpcclient.cpp \
-           src/rpcdump.cpp \
-           src/rpcmasternode-budget.cpp \
-           src/rpcmasternode.cpp \
-           src/rpcmining.cpp \
-           src/rpcmisc.cpp \
-           src/rpcnet.cpp \
-           src/rpcprotocol.cpp \
-           src/rpcrawtransaction.cpp \
-           src/rpcserver.cpp \
-           src/rpcwallet.cpp \
+           src/rpc/blockchain.cpp \
+           src/rpc/client.cpp \
+           src/rpc/dump.cpp \
+           src/rpc/masternode-budget.cpp \
+           src/rpc/masternode.cpp \
+           src/rpc/mining.cpp \
+           src/rpc/misc.cpp \
+           src/rpc/net.cpp \
+           src/rpc/protocol.cpp \
+           src/rpc/rawtransaction.cpp \
+           src/rpc/server.cpp \
+           src/wallet/rpcwallet.cpp \
            src/spork.cpp \
            src/support/cleanse.cpp \
            src/sync.cpp \

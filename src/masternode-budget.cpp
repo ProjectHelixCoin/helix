@@ -60,7 +60,7 @@ bool IsBudgetCollateralValid(uint256 nTxCollateralHash, uint256 nExpectedHash, s
     findScript << OP_RETURN << ToByteVector(nExpectedHash);
 
     bool foundOpReturn = false;
-    for (const CTxOut o : txCollateral.vout) {
+    for (const CTxOut & o : txCollateral.vout) {
         if (!o.scriptPubKey.IsNormalPaymentScript() && !o.scriptPubKey.IsUnspendable()) {
             strError = strprintf("Invalid Script %s", txCollateral.ToString());
             LogPrint("mnbudget","CBudgetProposalBroadcast::IsBudgetCollateralValid - %s\n", strError);
@@ -68,7 +68,7 @@ bool IsBudgetCollateralValid(uint256 nTxCollateralHash, uint256 nExpectedHash, s
         }
         if (fBudgetFinalization) {
             // Collateral for budget finalization
-            // Note: there are still old valid budgets out there, but the check for the new 5 HLIX finalization collateral
+            // Note: there are still old valid budgets out there, but the check for the new 25 HLIX finalization collateral
             //       will also cover the old 50 HLIX finalization collateral.
             LogPrint("mnbudget", "Final Budget: o.scriptPubKey(%s) == findScript(%s) ?\n", o.scriptPubKey.ToString(), findScript.ToString());
             if (o.scriptPubKey == findScript) {
@@ -925,7 +925,7 @@ CAmount CBudgetManager::GetTotalBudget(int nHeight)
         return 0.81 * COIN * 1440 * 30;
     } else if (nHeight > 2628001 && nHeight <= 58545900) {
         return 0.42 * COIN * 1440 * 30;
-    } else	
+    } else
 		return 0 * COIN * 1440 * 30;
 }
 
@@ -1127,7 +1127,6 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         mapSeenMasternodeBudgetVotes.insert(make_pair(vote.GetHash(), vote));
         if (!vote.SignatureValid(true)) {
             if (masternodeSync.IsSynced()) {
-            //if (masternodeSync.IsSynced()) Misbehaving(pfrom->GetId(), 20);
                 LogPrintf("CBudgetManager::ProcessMessage() : mvote - signature invalid\n");
                 Misbehaving(pfrom->GetId(), 20);
             }
@@ -1204,7 +1203,7 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
             if (masternodeSync.IsSynced()) {
                 LogPrintf("CBudgetManager::ProcessMessage() : fbvote - signature from masternode %s invalid\n", HexStr(pmn->pubKeyMasternode));
                 Misbehaving(pfrom->GetId(), 20);
-            }				
+            }
             // it could just be a non-synced masternode
             mnodeman.AskForMN(pfrom, vote.vin);
             return;
@@ -1916,7 +1915,7 @@ void CFinalizedBudget::CheckAndVote()
             LogPrint("mnbudget","CFinalizedBudget::AutoCheck - Budget-Proposal length (%ld) doesn't match Budget-Payment length (%ld).\n",
                       vBudgetProposalsSortedByHash.size(), vecBudgetPaymentsSortedByHash.size());
             return;
-		}
+        }
 
         for (unsigned int i = 0; i < vecBudgetPaymentsSortedByHash.size(); i++) {
             if (i > vBudgetProposalsSortedByHash.size() - 1) {

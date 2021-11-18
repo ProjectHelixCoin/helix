@@ -86,7 +86,7 @@
             <number>0</number>
            </property>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_Header" stretch="1,0,1">
+            <layout class="QHBoxLayout" name="horizontalLayout_Header" stretch="1">
              <property name="spacing">
               <number>6</number>
              </property>
@@ -823,7 +823,7 @@
                        <item row="1" column="0">
                         <widget class="QLabel" name="labelzBalanceMatureText">
                          <property name="toolTip">
-                          <string>Mature: more than 20 confirmation and more than 3 mints of the same denomination after it was minted.
+                          <string>Mature: more than 20 confirmation and more than 1 mint of the same denomination after it was minted.
 These zHLIX are spendable.</string>
                          </property>
                          <property name="text">
@@ -840,7 +840,7 @@ These zHLIX are spendable.</string>
                           </font>
                          </property>
                          <property name="toolTip">
-                          <string>Mature: more than 20 confirmation and more than 3 mints of the same denomination after it was minted.
+                          <string>Mature: more than 20 confirmation and more than 1 mint of the same denomination after it was minted.
 These zHLIX are spendable.</string>
                          </property>
                          <property name="text">

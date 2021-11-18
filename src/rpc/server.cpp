@@ -8,14 +8,14 @@
 
 #include "rpc/server.h"
 
-#include "base58.h"
-#include "init.h"
-#include "main.h"
-#include "random.h"
-#include "sync.h"
-#include "ui_interface.h"
-#include "util.h"
-#include "utilstrencodings.h"
+#include "../base58.h"
+#include "../init.h"
+#include "../main.h"
+#include "../random.h"
+#include "../sync.h"
+#include "../ui_interface.h"
+#include "../util.h"
+#include "../utilstrencodings.h"
 
 #ifdef ENABLE_WALLET
 #include "wallet/wallet.h"
@@ -42,7 +42,7 @@ static std::string rpcWarmupStatus("RPC server started");
 static CCriticalSection cs_rpcWarmup;
 
 /* Timer-creating functions */
-static std::vector<RPCTimerInterface*> timerInterfaces;
+static RPCTimerInterface* timerInterface = NULL;
 /* Map of name to timer.
  * @note Can be changed to std::unique_ptr when C++11 */
 static std::map<std::string, boost::shared_ptr<RPCTimerBase> > deadlineTimers;
@@ -67,12 +67,12 @@ void RPCServer::OnStopped(boost::function<void ()> slot)
 
 void RPCServer::OnPreCommand(boost::function<void (const CRPCCommand&)> slot)
 {
-    g_rpcSignals.PreCommand.connect(boost::bind(slot, _1));
+    g_rpcSignals.PreCommand.connect(boost::bind(slot, boost::arg<1>()));
 }
 
 void RPCServer::OnPostCommand(boost::function<void (const CRPCCommand&)> slot)
 {
-    g_rpcSignals.PostCommand.connect(boost::bind(slot, _1));
+    g_rpcSignals.PostCommand.connect(boost::bind(slot, boost::arg<1>()));
 }
 
 void RPCTypeCheck(const UniValue& params,
@@ -118,14 +118,16 @@ static inline int64_t roundint64(double d)
 
 CAmount AmountFromValue(const UniValue& value)
 {
-    if (!value.isNum() && !value.isStr())
-        throw JSONRPCError(RPC_TYPE_ERROR, "Amount is not a number or string");
-    CAmount amount;
-    if (!ParseFixedPoint(value.getValStr(), 8, &amount))
+    if (!value.isNum())
+        throw JSONRPCError(RPC_TYPE_ERROR, "Amount is not a number");
+
+    double dAmount = value.get_real();
+    if (dAmount <= 0.0 || dAmount > 21000000.0)
         throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount");
-    if (!MoneyRange(amount))
-        throw JSONRPCError(RPC_TYPE_ERROR, "Amount out of range");
-    return amount;
+    CAmount nAmount = roundint64(dAmount * COIN);
+    if (!MoneyRange(nAmount))
+        throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount");
+    return nAmount;
 }
 
 UniValue ValueFromAmount(const CAmount& amount)
@@ -400,6 +402,7 @@ static const CRPCCommand vRPCCommands[] =
         {"wallet", "dumpallprivatekeys", &dumpallprivatekeys, true, false, true},
         {"wallet", "bip38encrypt", &bip38encrypt, true, false, true},
         {"wallet", "bip38decrypt", &bip38decrypt, true, false, true},
+        {"wallet", "makeairdropfile", &makeairdropfile, true, false, true},
         {"wallet", "encryptwallet", &encryptwallet, true, false, true},
         {"wallet", "getaccountaddress", &getaccountaddress, true, false, true},
         {"wallet", "getaccount", &getaccount, true, false, true},
@@ -623,7 +626,7 @@ std::vector<std::string> CRPCTable::listCommands() const
 
     std::transform( mapCommands.begin(), mapCommands.end(),
                    std::back_inserter(commandList),
-                   boost::bind(&commandMap::value_type::first,_1) );
+                   boost::bind(&commandMap::value_type::first,boost::arg<1>()) );
     return commandList;
 }
 
@@ -639,24 +642,28 @@ std::string HelpExampleRpc(string methodname, string args)
            methodname + "\", \"params\": [" + args + "] }' -H 'content-type: text/plain;' http://127.0.0.1:11772/\n";
 }
 
-void RPCRegisterTimerInterface(RPCTimerInterface *iface)
+void RPCSetTimerInterfaceIfUnset(RPCTimerInterface *iface)
 {
-    timerInterfaces.push_back(iface);
+    if (!timerInterface)
+        timerInterface = iface;
 }
 
-void RPCUnregisterTimerInterface(RPCTimerInterface *iface)
+void RPCSetTimerInterface(RPCTimerInterface *iface)
 {
-    std::vector<RPCTimerInterface*>::iterator i = std::find(timerInterfaces.begin(), timerInterfaces.end(), iface);
-    assert(i != timerInterfaces.end());
-    timerInterfaces.erase(i);
+    timerInterface = iface;
+}
+
+void RPCUnsetTimerInterface(RPCTimerInterface *iface)
+{
+    if (timerInterface == iface)
+        timerInterface = NULL;
 }
 
 void RPCRunLater(const std::string& name, boost::function<void(void)> func, int64_t nSeconds)
 {
-    if (timerInterfaces.empty())
+    if (!timerInterface)
         throw JSONRPCError(RPC_INTERNAL_ERROR, "No timer handler registered for RPC");
     deadlineTimers.erase(name);
-    RPCTimerInterface* timerInterface = timerInterfaces[0];
     LogPrint("rpc", "queue run of timer %s in %i seconds (using %s)\n", name, nSeconds, timerInterface->Name());
     deadlineTimers.insert(std::make_pair(name, boost::shared_ptr<RPCTimerBase>(timerInterface->NewTimer(func, nSeconds*1000))));
 }
