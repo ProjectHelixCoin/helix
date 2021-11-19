@@ -57,7 +57,7 @@ Instructions: Homebrew
         
         chmod +x share/genbuild.sh autogen.sh 
         ./autogen.sh
-        ./configure --with-gui=qt5 
+        ./configure --with-gui=qt5 --with-unsupported-ssl
         make
 (note: if configure fails with libprotobuf not found see [Troubleshooting](#trouble) at the bottom)
 
